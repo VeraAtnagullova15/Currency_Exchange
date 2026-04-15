@@ -28,6 +28,4 @@ public class CurrenciesServlet extends HttpServlet {
         PrintWriter printWriter = response.getWriter();
         printWriter.write("{}");
     }
-
-
 }
