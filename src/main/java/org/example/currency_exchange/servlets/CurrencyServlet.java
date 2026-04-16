@@ -17,10 +17,17 @@ public class CurrencyServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        String resp = request.getPathInfo();
+        String resp = request.getPathInfo().substring(1);
 
         PrintWriter printWriter = response.getWriter();
-        printWriter.write(resp);
+
+        if ((resp.equals("")) || (resp == null) || (resp.length() != 3)) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            printWriter.write("{\"message\": \"Код валюты отсутствует в адресе\"}");
+        } else {
+            response.setStatus(HttpServletResponse.SC_OK);
+            printWriter.write(resp);
+        }
 
     }
 }

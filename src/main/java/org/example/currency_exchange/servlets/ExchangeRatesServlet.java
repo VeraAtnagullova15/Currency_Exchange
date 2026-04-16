@@ -1,13 +1,17 @@
 package org.example.currency_exchange.servlets;
+
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/currencies")
-public class CurrenciesServlet extends HttpServlet {
+
+@WebServlet("/exchangeRates")
+public class ExchangeRatesServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -17,28 +21,31 @@ public class CurrenciesServlet extends HttpServlet {
         PrintWriter printWriter = response.getWriter();
         response.setStatus(HttpServletResponse.SC_OK);
         printWriter.write("[]");
-
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        String name = request.getParameter("name");
-        String code = request.getParameter("code");
-        String sign = request.getParameter("sign");
+
+        String baseCurrencyCode = request.getParameter("baseCurrencyCode");
+        String targetCurrencyCode = request.getParameter("targetCurrencyCode");
+        String rate = request.getParameter("rate");
+
         //TODO: put information in DataBase
 
         PrintWriter printWriter = response.getWriter();
 
-        if ((name == null) || (name.equals("")) ||
-                (code == null) || (code.length() != 3) ||
-                (sign == null) || (sign.equals(""))) {
+        if (baseCurrencyCode == null || baseCurrencyCode.equals("") || baseCurrencyCode.length() != 3 ||
+                targetCurrencyCode == null || targetCurrencyCode.equals("") || targetCurrencyCode.length() != 3 ||
+                rate == null || rate.equals("")) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             printWriter.write("{\"message\": \"Отсутствует одно из полей\"}");
         } else {
             response.setStatus(HttpServletResponse.SC_CREATED);
             printWriter.write("{}");
         }
+
+
     }
 }
