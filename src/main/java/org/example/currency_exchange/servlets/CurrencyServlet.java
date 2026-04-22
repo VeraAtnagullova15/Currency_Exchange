@@ -5,12 +5,17 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.currency_exchange.dao.CurrencyDao;
+import org.example.currency_exchange.models.Currency;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 
 @WebServlet("/currency/*")
 public class CurrencyServlet extends HttpServlet {
+
+    private final CurrencyDao currencyDao = new CurrencyDao();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
 
@@ -25,8 +30,14 @@ public class CurrencyServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             printWriter.write("{\"message\": \"Код валюты отсутствует в адресе\"}");
         } else {
-            response.setStatus(HttpServletResponse.SC_OK);
-            printWriter.write(resp);
+            try {
+                Currency currency = currencyDao.getCurrencyByCode(resp);
+                response.setStatus(HttpServletResponse.SC_OK);
+                printWriter.write(currency.toString());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
         }
 
     }
