@@ -59,5 +59,21 @@ public class CurrencyDao {
 
     }
 
+    public void putCurrencyIntoDB(String code,String name, String sign) throws SQLException {
+
+        String sql = "INSERT OR IGNORE INTO Currencies(Code, FullName, Sign)\n" +
+                "VALUES(?, ?, ?)";
+
+        try(Connection connection = ConnectionManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);) {
+
+            preparedStatement.setString(1, code);
+            preparedStatement.setString(2, name);
+            preparedStatement.setString(3, sign);
+
+            preparedStatement.executeUpdate();
+        }
+    }
+
 
 }

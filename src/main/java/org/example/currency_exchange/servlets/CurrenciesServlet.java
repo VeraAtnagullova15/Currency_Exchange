@@ -4,6 +4,7 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import org.example.currency_exchange.dao.CurrencyDao;
 import org.example.currency_exchange.models.Currency;
+import org.example.currency_exchange.service.CurrencyService;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,7 +14,7 @@ import java.util.List;
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
 
-    private final CurrencyDao currencyDao = new CurrencyDao();
+    private final CurrencyService currencyService = new CurrencyService();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -23,7 +24,7 @@ public class CurrenciesServlet extends HttpServlet {
         PrintWriter printWriter = response.getWriter();
 
         try {
-            List<Currency> currencies = currencyDao.getAllCurrencies();
+            List<Currency> currencies = currencyService.getAllCurrencies();
             response.setStatus(HttpServletResponse.SC_OK);
             printWriter.write(currencies.toString());
         } catch (SQLException e) {
@@ -43,7 +44,6 @@ public class CurrenciesServlet extends HttpServlet {
         String name = request.getParameter("name");
         String code = request.getParameter("code");
         String sign = request.getParameter("sign");
-        //TODO: put information in DataBase
 
         PrintWriter printWriter = response.getWriter();
 
@@ -54,7 +54,14 @@ public class CurrenciesServlet extends HttpServlet {
             printWriter.write("{\"message\": \"Отсутствует одно из полей\"}");
         } else {
             response.setStatus(HttpServletResponse.SC_CREATED);
-            printWriter.write("{}");
+            try {
+                currencyService.putCurrencyIntoDB(code, name, sign);
+                Currency currency = currencyService.getCurrencyByCode(code);
+                printWriter.write(currency.toString());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }
