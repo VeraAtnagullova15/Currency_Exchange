@@ -12,6 +12,7 @@ import org.example.currency_exchange.service.CurrencyService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Optional;
 
 @WebServlet("/currency/*")
 public class CurrencyServlet extends HttpServlet {
@@ -22,24 +23,31 @@ public class CurrencyServlet extends HttpServlet {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-
-        String resp = request.getPathInfo().toUpperCase().substring(1);
-
         PrintWriter printWriter = response.getWriter();
 
-        if ((resp.equals("")) || (resp == null) || (resp.length() != 3)) {
+        String pathInfo = request.getPathInfo();
+
+        if (pathInfo == null || pathInfo.length() != 4) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             printWriter.write("{\"message\": \"Код валюты отсутствует в адресе\"}");
-        } else {
-            try {
-                Currency currency = currencyService.getCurrencyByCode(resp);
-                response.setStatus(HttpServletResponse.SC_OK);
-                printWriter.write(currency.toString());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
         }
 
+        String code = pathInfo.toUpperCase().substring(1);
+
+        try {
+            Optional<Currency> optional = currencyService.getCurrencyByCode(code);
+
+            if (optional.isPresent()) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                printWriter.write(optional.get().toString());
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                printWriter.write("{\"message\": \"Валюта не найдена\"}");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            printWriter.write("{\"message\": \"Ошибка базы данных\"}");
+        }
     }
 }

@@ -5,6 +5,7 @@ import org.example.currency_exchange.models.Currency;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CurrencyDao {
 
@@ -33,7 +34,7 @@ public class CurrencyDao {
         return currencies;
     }
 
-    public Currency getCurrencyByCode(String code) throws SQLException {
+    public Optional<Currency> getCurrencyByCode(String code) throws SQLException {
 
         String sql = "SELECT * FROM Currencies WHERE Code=?";
 
@@ -50,12 +51,12 @@ public class CurrencyDao {
                     currency.setCode(resultSet.getString("Code"));
                     currency.setFullName(resultSet.getString("FullName"));
                     currency.setSign(resultSet.getString("Sign"));
-                    return currency;
+                    return Optional.of(currency);
                 }
             }
         }
 
-        return null;
+        return Optional.empty();
 
     }
 

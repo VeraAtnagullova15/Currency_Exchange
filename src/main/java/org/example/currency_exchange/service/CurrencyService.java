@@ -5,6 +5,7 @@ import org.example.currency_exchange.models.Currency;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public class CurrencyService {
 
@@ -14,7 +15,7 @@ public class CurrencyService {
         return currencyDao.getAllCurrencies();
     }
 
-    public Currency getCurrencyByCode(String code) throws SQLException{
+    public Optional<Currency> getCurrencyByCode(String code) throws SQLException{
         return currencyDao.getCurrencyByCode(code);
     }
 

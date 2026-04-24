@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
@@ -56,10 +57,12 @@ public class CurrenciesServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_CREATED);
             try {
                 currencyService.putCurrencyIntoDB(code, name, sign);
-                Currency currency = currencyService.getCurrencyByCode(code);
-                printWriter.write(currency.toString());
+                Optional<Currency> optional = currencyService.getCurrencyByCode(code);
+                printWriter.write(optional.get().toString());
             } catch (SQLException e) {
                 e.printStackTrace();
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                printWriter.write("{\"message\": \"Ошибка базы данных\"}");
             }
 
         }
