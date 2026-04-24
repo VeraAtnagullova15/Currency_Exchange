@@ -5,17 +5,22 @@ import org.example.currency_exchange.models.Currency;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CurrencyDao {
+
+    private static final String SQL_GET_ALL_CURRENCIES = "SELECT * FROM Currencies";
+    private static final String SQL_GET_CURRENCY_BY_CODE = "SELECT * FROM Currencies WHERE Code=?";
+    private static final String SQL_PUT_CURRENCY = "INSERT OR IGNORE INTO Currencies(Code, FullName, Sign)\n" +
+            "VALUES(?, ?, ?)";
 
     public List<Currency> getAllCurrencies() throws SQLException {
 
         List<Currency> currencies = new ArrayList<>();
-        String sql = "SELECT * FROM Currencies";
 
         try (Connection connection = ConnectionManager.getConnection();
         Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(sql);) {
+        ResultSet resultSet = statement.executeQuery(SQL_GET_ALL_CURRENCIES);) {
 
 
             while (resultSet.next()) {
@@ -33,12 +38,10 @@ public class CurrencyDao {
         return currencies;
     }
 
-    public Currency getCurrencyByCode(String code) throws SQLException {
-
-        String sql = "SELECT * FROM Currencies WHERE Code=?";
+    public Optional<Currency> getCurrencyByCode(String code) throws SQLException {
 
         try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_CURRENCY_BY_CODE);) {
 
             preparedStatement.setString(1, code);
 
@@ -50,22 +53,19 @@ public class CurrencyDao {
                     currency.setCode(resultSet.getString("Code"));
                     currency.setFullName(resultSet.getString("FullName"));
                     currency.setSign(resultSet.getString("Sign"));
-                    return currency;
+                    return Optional.of(currency);
                 }
             }
         }
 
-        return null;
+        return Optional.empty();
 
     }
 
     public void putCurrencyIntoDB(String code,String name, String sign) throws SQLException {
 
-        String sql = "INSERT OR IGNORE INTO Currencies(Code, FullName, Sign)\n" +
-                "VALUES(?, ?, ?)";
-
         try(Connection connection = ConnectionManager.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);) {
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_PUT_CURRENCY);) {
 
             preparedStatement.setString(1, code);
             preparedStatement.setString(2, name);

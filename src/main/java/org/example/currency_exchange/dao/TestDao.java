@@ -8,15 +8,15 @@ public class TestDao {
     public static void main(String[] args) {
         CurrencyDao dao = new CurrencyDao();
 
-//        try {
-//            List<Currency> currencies = dao.getAllCurrencies();
-//
-//            for (Currency currency : currencies) {
-//                System.out.println(currency.getId() + "," + currency.getCode() + "," + currency.getFullName() + "," + currency.getSign());
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            List<Currency> currencies = dao.getAllCurrencies();
+
+            for (Currency currency : currencies) {
+                System.out.println(currency.getId() + "," + currency.getCode() + "," + currency.getFullName() + "," + currency.getSign());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
 //        try{
 //            Currency currency = dao.getCurrencyByCode("USD");
