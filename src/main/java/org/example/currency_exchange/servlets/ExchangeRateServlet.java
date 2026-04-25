@@ -15,9 +15,6 @@ public class ExchangeRateServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
         String couple = request.getPathInfo().substring(1);
 
         PrintWriter printWriter = response.getWriter();
@@ -34,9 +31,6 @@ public class ExchangeRateServlet extends HttpServlet {
     protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
         if ("PATCH".equalsIgnoreCase(request.getMethod())) {
-
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
 
             PrintWriter printWriter = response.getWriter();
 

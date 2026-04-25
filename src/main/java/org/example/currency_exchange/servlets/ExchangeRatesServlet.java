@@ -15,8 +15,6 @@ public class ExchangeRatesServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
         //TODO: get information from DataBase
         PrintWriter printWriter = response.getWriter();
         response.setStatus(HttpServletResponse.SC_OK);
@@ -24,9 +22,6 @@ public class ExchangeRatesServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
 
         String baseCurrencyCode = request.getParameter("baseCurrencyCode");
         String targetCurrencyCode = request.getParameter("targetCurrencyCode");

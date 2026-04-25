@@ -11,7 +11,7 @@ public class CurrencyDao {
 
     private static final String SQL_GET_ALL_CURRENCIES = "SELECT * FROM Currencies";
     private static final String SQL_GET_CURRENCY_BY_CODE = "SELECT * FROM Currencies WHERE Code=?";
-    private static final String SQL_PUT_CURRENCY = "INSERT Currencies(Code, FullName, Sign)\n" +
+    private static final String SQL_PUT_CURRENCY = "INSERT INTO Currencies(Code, FullName, Sign)\n" +
             "VALUES(?, ?, ?)";
 
     public List<Currency> getAllCurrencies() throws SQLException {

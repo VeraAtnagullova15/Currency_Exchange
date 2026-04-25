@@ -1,8 +1,8 @@
 package org.example.currency_exchange.servlets;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
-import org.example.currency_exchange.dao.CurrencyDao;
 import org.example.currency_exchange.models.Currency;
 import org.example.currency_exchange.service.CurrencyService;
 
@@ -16,18 +16,16 @@ import java.util.Optional;
 public class CurrenciesServlet extends HttpServlet {
 
     private final CurrencyService currencyService = new CurrencyService();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
 
         PrintWriter printWriter = response.getWriter();
 
         try {
             List<Currency> currencies = currencyService.getAllCurrencies();
             response.setStatus(HttpServletResponse.SC_OK);
-            printWriter.write(currencies.toString());
+            objectMapper.writeValue(printWriter, currencies);
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -40,8 +38,6 @@ public class CurrenciesServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
         String name = request.getParameter("name");
         String code = request.getParameter("code");
         String sign = request.getParameter("sign");
@@ -58,11 +54,17 @@ public class CurrenciesServlet extends HttpServlet {
             try {
                 currencyService.putCurrencyIntoDB(code, name, sign);
                 Optional<Currency> optional = currencyService.getCurrencyByCode(code);
-                printWriter.write(optional.get().toString());
+                Currency currency = optional.get();
+                objectMapper.writeValue(printWriter, currency);
             } catch (SQLException e) {
-                e.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                printWriter.write("{\"message\": \"Ошибка базы данных\"}");
+                if (e.getMessage().contains("UNIQUE constraint failed")) {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    printWriter.write("{\"message\": \"Валюта с таким кодом уже существует\"}");
+                } else {
+                    e.printStackTrace();
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    printWriter.write("{\"message\": \"Ошибка базы данных\"}");
+                }
             }
 
         }

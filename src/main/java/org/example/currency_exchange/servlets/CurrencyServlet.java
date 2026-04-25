@@ -1,11 +1,11 @@
 package org.example.currency_exchange.servlets;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.currency_exchange.dao.CurrencyDao;
 import org.example.currency_exchange.models.Currency;
 import org.example.currency_exchange.service.CurrencyService;
 
@@ -18,11 +18,10 @@ import java.util.Optional;
 public class CurrencyServlet extends HttpServlet {
 
     private final CurrencyService currencyService= new CurrencyService();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
         PrintWriter printWriter = response.getWriter();
 
         String pathInfo = request.getPathInfo();
@@ -37,10 +36,11 @@ public class CurrencyServlet extends HttpServlet {
 
         try {
             Optional<Currency> optional = currencyService.getCurrencyByCode(code);
+            Currency currency = optional.get();
 
             if (optional.isPresent()) {
                 response.setStatus(HttpServletResponse.SC_OK);
-                printWriter.write(optional.get().toString());
+                objectMapper.writeValue(printWriter, currency);
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 printWriter.write("{\"message\": \"Валюта не найдена\"}");

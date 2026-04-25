@@ -15,9 +15,6 @@ public class ExchangeServlet extends HttpServlet {
 
     protected void doGet (HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
         String from = request.getParameter("from");
         String to = request.getParameter("to");
         String amount = request.getParameter("amount");
@@ -34,8 +31,6 @@ public class ExchangeServlet extends HttpServlet {
             printWriter.write("{}");
             //TODO: set logics
         }
-
-
 
     }
 }
