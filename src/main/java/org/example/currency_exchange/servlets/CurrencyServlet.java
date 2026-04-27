@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.currency_exchange.dto.CurrencyDto;
 import org.example.currency_exchange.models.Currency;
 import org.example.currency_exchange.service.CurrencyService;
 
@@ -37,10 +38,11 @@ public class CurrencyServlet extends HttpServlet {
         try {
             Optional<Currency> optional = currencyService.getCurrencyByCode(code);
             Currency currency = optional.get();
+            CurrencyDto currencyDto = CurrencyDto.toDto(currency);
 
             if (optional.isPresent()) {
                 response.setStatus(HttpServletResponse.SC_OK);
-                objectMapper.writeValue(printWriter, currency);
+                objectMapper.writeValue(printWriter, currencyDto);
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 printWriter.write("{\"message\": \"Валюта не найдена\"}");

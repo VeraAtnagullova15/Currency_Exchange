@@ -3,12 +3,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import org.example.currency_exchange.dto.CurrencyDto;
 import org.example.currency_exchange.models.Currency;
 import org.example.currency_exchange.service.CurrencyService;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +26,12 @@ public class CurrenciesServlet extends HttpServlet {
 
         try {
             List<Currency> currencies = currencyService.getAllCurrencies();
+            List<CurrencyDto> currencyDtos = new ArrayList<>();
+            for (Currency currency : currencies) {
+                currencyDtos.add(CurrencyDto.toDto(currency));
+            }
             response.setStatus(HttpServletResponse.SC_OK);
-            objectMapper.writeValue(printWriter, currencies);
+            objectMapper.writeValue(printWriter, currencyDtos);
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -55,6 +61,7 @@ public class CurrenciesServlet extends HttpServlet {
                 currencyService.putCurrencyIntoDB(code, name, sign);
                 Optional<Currency> optional = currencyService.getCurrencyByCode(code);
                 Currency currency = optional.get();
+                CurrencyDto currencyDto = CurrencyDto.toDto(currency);
                 objectMapper.writeValue(printWriter, currency);
             } catch (SQLException e) {
                 if (e.getMessage().contains("UNIQUE constraint failed")) {
