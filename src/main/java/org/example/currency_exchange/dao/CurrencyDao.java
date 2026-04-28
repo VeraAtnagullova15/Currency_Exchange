@@ -1,5 +1,6 @@
 package org.example.currency_exchange.dao;
 
+import org.example.currency_exchange.exceptions.DataBaseException;
 import org.example.currency_exchange.models.Currency;
 
 import java.sql.*;
@@ -14,7 +15,7 @@ public class CurrencyDao {
     private static final String SQL_PUT_CURRENCY = "INSERT INTO Currencies(Code, FullName, Sign)\n" +
             "VALUES(?, ?, ?)";
 
-    public List<Currency> getAllCurrencies() throws SQLException {
+    public List<Currency> getAllCurrencies() throws DataBaseException {
 
         List<Currency> currencies = new ArrayList<>();
 
@@ -33,12 +34,15 @@ public class CurrencyDao {
 
                 currencies.add(currency);
             }
+        } catch (SQLException sqlException) {
+            throw new DataBaseException(sqlException.getMessage());
         }
 
         return currencies;
     }
 
-    public Optional<Currency> getCurrencyByCode(String code) throws SQLException {
+
+    public Optional<Currency> getCurrencyByCode(String code) throws DataBaseException {
 
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_CURRENCY_BY_CODE);) {
@@ -56,13 +60,15 @@ public class CurrencyDao {
                     return Optional.of(currency);
                 }
             }
+        } catch (SQLException sqlException) {
+            throw new DataBaseException(sqlException.getMessage());
         }
 
         return Optional.empty();
 
     }
 
-    public void putCurrencyIntoDB(String code,String name, String sign) throws SQLException {
+    public void putCurrencyIntoDB(String code,String name, String sign) throws DataBaseException {
 
         try(Connection connection = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_PUT_CURRENCY);) {
@@ -72,6 +78,8 @@ public class CurrencyDao {
             preparedStatement.setString(3, sign);
 
             preparedStatement.executeUpdate();
+        } catch (SQLException sqlException) {
+            throw new DataBaseException(sqlException.getMessage());
         }
     }
 
