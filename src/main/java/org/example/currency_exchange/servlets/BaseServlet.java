@@ -32,7 +32,13 @@ public abstract class BaseServlet extends HttpServlet {
     }
 
     protected void validateCurrencyPairLength(String pair, String message) throws ValidationException {
-        if (!ValidationUtils.isValidLengthCode(pair)) {
+        if (!ValidationUtils.isValidLengthCurrencyPair(pair)) {
+            throw new ValidationException(message);
+        }
+    }
+
+    protected void validateRateValue(String rate, String message) {
+        if (!ValidationUtils.isValidRateType(rate)) {
             throw new ValidationException(message);
         }
     }

@@ -32,10 +32,10 @@ public class ExchangeRateServlet extends BaseServlet {
 
         validateNotBlank(baseCurrency, "Код валюты отсутствует в адресе");
         validateNotBlank(targetCurrency, "Код валюты отсутствует в адресе");
-        validateCodeLength(baseCurrency, "Поле baseCurrency должно состоять из трех букв");
-        validateCodeLength(targetCurrency, "Поле targetCurrency должно состоять из трех букв");
-        validateCodeValue(baseCurrency, "Поле baseCurrency должно состоять только из латинских букв");
-        validateCodeValue(targetCurrency, "Поле targetCurrency должно состоять только из латинских букв");
+        validateCodeLength(baseCurrency, "Код валюты должен состоять из трех букв");
+        validateCodeLength(targetCurrency, "ПКод валюты должен состоять из трех букв");
+        validateCodeValue(baseCurrency, "Код валюты должен состоять только из латинских букв");
+        validateCodeValue(targetCurrency, "Код валюты должен состоять только из латинских букв");
 
         Optional<ExchangeRate> optional = exchangeRateService.getExchangeRateByCodes(baseCurrency, targetCurrency);
 

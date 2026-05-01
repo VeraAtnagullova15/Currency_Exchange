@@ -20,4 +20,8 @@ public class ValidationUtils {
     public static boolean isValidLengthCurrencyPair(String pair) {
         return pair.length() == CURRENCY_PAIR_LENGTH;
     }
+
+    public static boolean isValidRateType(String rate) {
+        return rate.matches("^[\\d.,]+$");
+    }
 }

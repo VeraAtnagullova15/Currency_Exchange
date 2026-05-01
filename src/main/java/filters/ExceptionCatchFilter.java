@@ -24,14 +24,14 @@ public class ExceptionCatchFilter implements Filter {
             filterChain.doFilter(servletRequest, servletResponse);
         } catch (NoSuchElementException elementException) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            printWriter.write("{\"message\": \"Валюта с таким кодом не найдена\"}");
+            printWriter.write("{\"message\": \"Указанная валюта не найдена\"}");
         } catch (ValidationException validationException) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             printWriter.write("{\"message\": \"" + validationException.getMessage() + "\"}");
         } catch (DataBaseException dataBaseException) {
             if (dataBaseException.getMessage().contains("UNIQUE constraint failed")) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                printWriter.write("{\"message\": \"Валюта с таким кодом уже существует\"}");
+                printWriter.write("{\"message\": \"Поле с такими данными уже существует\"}");
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 printWriter.write("{\"message\": \"Ошибка базы данных\"}");

@@ -39,11 +39,11 @@ public class CurrenciesServlet extends BaseServlet {
 
         PrintWriter printWriter = response.getWriter();
 
-        validateCodeLength(code, "Поле code должно состоять из трех букв");
+        validateCodeLength(code, "Код валюты должен состоять из трех букв");
         validateNotBlank(code, "Отсутствует поле code");
         validateNotBlank(name, "Отсутствует поле name");
         validateNotBlank(sign, "Отсутствует поле sign");
-        validateCodeValue(code, "Поле code должно состоять только из латинских букв");
+        validateCodeValue(code, "Код валюты должен состоять только из латинских букв");
 
 
         response.setStatus(HttpServletResponse.SC_CREATED);

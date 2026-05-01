@@ -4,6 +4,7 @@ import org.example.currency_exchange.exceptions.DataBaseException;
 import org.example.currency_exchange.models.Currency;
 import org.example.currency_exchange.models.ExchangeRate;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,8 @@ public class ExchangeRateDao {
             JOIN Currencies target ON ex.TargetCurrencyId = target.ID
             WHERE base.Code=? AND target.Code=?            
             """;
-
-
+    private static final String SQL_PUT_EXCHANGE_RATE = "INSERT INTO ExchangeRates(BaseCurrencyID, TargetCurrencyID, Rate)" +
+            " VALUES(?,?,?)";
 
 
     public List<ExchangeRate> getAllExchangeRates() throws DataBaseException {
@@ -57,7 +58,7 @@ public class ExchangeRateDao {
 
     }
 
-    public Optional<ExchangeRate> getExchangeRatesByCodes(String base, String target) {
+    public Optional<ExchangeRate> getExchangeRatesByCodes(String base, String target) throws DataBaseException {
 
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_EXCHANGE_RATE);) {
@@ -89,6 +90,27 @@ public class ExchangeRateDao {
 
         return Optional.empty();
 
+    }
+
+    public void putExchangeRateIntoDB(String base, String target, BigDecimal rate) throws DataBaseException {
+
+        Currency baseCurrency = currencyDao.getCurrencyByCode(base)
+                .orElseThrow(NoSuchElementException::new);
+        Currency targetCurrency = currencyDao.getCurrencyByCode(target)
+                .orElseThrow(NoSuchElementException::new);
+
+        try(Connection connection = ConnectionManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_PUT_EXCHANGE_RATE);) {
+
+            preparedStatement.setInt(1, baseCurrency.getId());
+            preparedStatement.setInt(2, targetCurrency.getId());
+            preparedStatement.setBigDecimal(3, rate);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException sqlException) {
+            throw new DataBaseException(sqlException.getMessage());
+        }
     }
 
 
