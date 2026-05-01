@@ -5,8 +5,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.currency_exchange.dto.CurrencyDto;
-import org.example.currency_exchange.exceptions.DataBaseException;
-import org.example.currency_exchange.exceptions.ValidationException;
 import org.example.currency_exchange.models.Currency;
 
 import java.io.IOException;
@@ -36,7 +34,7 @@ public class CurrencyServlet extends BaseServlet {
             throw new NoSuchElementException();
         } else {
             Currency currency = optional.get();
-            CurrencyDto currencyDto = CurrencyDto.toDto(currency);
+            CurrencyDto currencyDto = CurrencyDto.currencyToDto(currency);
             response.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(printWriter, currencyDto);
 

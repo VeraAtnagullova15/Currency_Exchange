@@ -4,7 +4,6 @@ import org.example.currency_exchange.dao.CurrencyDao;
 import org.example.currency_exchange.exceptions.DataBaseException;
 import org.example.currency_exchange.models.Currency;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 

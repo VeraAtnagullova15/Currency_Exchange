@@ -1,17 +1,12 @@
 package org.example.currency_exchange.servlets;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import org.example.currency_exchange.dto.CurrencyDto;
-import org.example.currency_exchange.exceptions.DataBaseException;
-import org.example.currency_exchange.exceptions.ValidationException;
 import org.example.currency_exchange.models.Currency;
-import org.example.currency_exchange.service.CurrencyService;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -27,7 +22,7 @@ public class CurrenciesServlet extends BaseServlet {
         List<Currency> currencies = currencyService.getAllCurrencies();
         List<CurrencyDto> currencyDtos = new ArrayList<>();
         for (Currency currency : currencies) {
-            currencyDtos.add(CurrencyDto.toDto(currency));
+            currencyDtos.add(CurrencyDto.currencyToDto(currency));
         }
         response.setStatus(HttpServletResponse.SC_OK);
         objectMapper.writeValue(printWriter, currencyDtos);
@@ -59,7 +54,7 @@ public class CurrenciesServlet extends BaseServlet {
             throw new NoSuchElementException();
         } else {
             Currency currency = optional.get();
-            CurrencyDto currencyDto = CurrencyDto.toDto(currency);
+            CurrencyDto currencyDto = CurrencyDto.currencyToDto(currency);
             objectMapper.writeValue(printWriter, currencyDto);
 
         }

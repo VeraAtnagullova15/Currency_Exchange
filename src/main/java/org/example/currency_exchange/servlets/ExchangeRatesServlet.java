@@ -5,20 +5,31 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.currency_exchange.dto.ExchangeRateDto;
+import org.example.currency_exchange.models.ExchangeRate;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @WebServlet("/exchangeRates")
-public class ExchangeRatesServlet extends HttpServlet {
+public class ExchangeRatesServlet extends BaseServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        //TODO: get information from DataBase
         PrintWriter printWriter = response.getWriter();
+
+        List<ExchangeRate> exchangeRates = exchangeRateService.getAllExchangeRates();
+        List<ExchangeRateDto> exchangeRateDtos = new ArrayList<>();
+
+        for (ExchangeRate ex : exchangeRates) {
+            exchangeRateDtos.add(ExchangeRateDto.exchangeRateToDto(ex));
+        }
+
         response.setStatus(HttpServletResponse.SC_OK);
-        printWriter.write("[]");
+        objectMapper.writeValue(printWriter, exchangeRateDtos);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
