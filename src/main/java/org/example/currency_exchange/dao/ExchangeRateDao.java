@@ -25,6 +25,9 @@ public class ExchangeRateDao {
     private static final String SQL_PUT_EXCHANGE_RATE = "INSERT INTO ExchangeRates(BaseCurrencyID, TargetCurrencyID, Rate)" +
             " VALUES(?,?,?)";
 
+    private static final String SQL_UPDATE_EXCHANGE_RATE = "UPDATE ExchangeRates SET Rate=? " +
+            "WHERE BaseCurrencyId=? AND TargetCurrencyId=?";
+
 
     public List<ExchangeRate> getAllExchangeRates() throws DataBaseException {
 
@@ -113,5 +116,26 @@ public class ExchangeRateDao {
         }
     }
 
+
+    public void updateExchangeRate(String base, String target, BigDecimal rate) {
+
+        Currency baseCurrency = currencyDao.getCurrencyByCode(base)
+                .orElseThrow(NoSuchElementException::new);
+        Currency targetCurrency = currencyDao.getCurrencyByCode(target)
+                .orElseThrow(NoSuchElementException::new);
+
+        try(Connection connection = ConnectionManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_EXCHANGE_RATE);) {
+
+            preparedStatement.setBigDecimal(1, rate);
+            preparedStatement.setInt(2, baseCurrency.getId());
+            preparedStatement.setInt(3, targetCurrency.getId());
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException sqlException) {
+            throw new DataBaseException(sqlException.getMessage());
+        }
+    }
 
 }

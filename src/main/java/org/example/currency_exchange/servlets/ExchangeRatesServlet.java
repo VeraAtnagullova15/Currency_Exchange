@@ -4,7 +4,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.currency_exchange.dto.CurrencyDto;
 import org.example.currency_exchange.dto.ExchangeRateDto;
 import org.example.currency_exchange.models.ExchangeRate;
 

@@ -2,7 +2,6 @@ package org.example.currency_exchange.service;
 
 import org.example.currency_exchange.dao.ExchangeRateDao;
 import org.example.currency_exchange.exceptions.DataBaseException;
-import org.example.currency_exchange.models.Currency;
 import org.example.currency_exchange.models.ExchangeRate;
 
 import java.math.BigDecimal;
@@ -23,6 +22,10 @@ public class ExchangeRateService {
 
     public void putExchangeRateIntoDB(String base, String target, BigDecimal rate) throws DataBaseException {
         exchangeRateDao.putExchangeRateIntoDB(base, target, rate);
+    }
+
+    public void updateExchangeRate(String base, String target, BigDecimal rate) {
+        exchangeRateDao.updateExchangeRate(base, target, rate);
     }
 
 

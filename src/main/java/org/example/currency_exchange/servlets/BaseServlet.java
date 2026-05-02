@@ -43,4 +43,10 @@ public abstract class BaseServlet extends HttpServlet {
         }
     }
 
+    protected void validatePatchBodyRequest(String body, String message) {
+        if (!ValidationUtils.isValidRequestBody(body)) {
+            throw new ValidationException(message);
+        }
+    }
+
 }

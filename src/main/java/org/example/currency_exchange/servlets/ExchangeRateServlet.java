@@ -10,6 +10,7 @@ import org.example.currency_exchange.models.ExchangeRate;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class ExchangeRateServlet extends BaseServlet {
         validateNotBlank(baseCurrency, "Код валюты отсутствует в адресе");
         validateNotBlank(targetCurrency, "Код валюты отсутствует в адресе");
         validateCodeLength(baseCurrency, "Код валюты должен состоять из трех букв");
-        validateCodeLength(targetCurrency, "ПКод валюты должен состоять из трех букв");
+        validateCodeLength(targetCurrency, "Код валюты должен состоять из трех букв");
         validateCodeValue(baseCurrency, "Код валюты должен состоять только из латинских букв");
         validateCodeValue(targetCurrency, "Код валюты должен состоять только из латинских букв");
 
@@ -55,27 +56,42 @@ public class ExchangeRateServlet extends BaseServlet {
 
         if ("PATCH".equalsIgnoreCase(request.getMethod())) {
 
+            String pathInfo = request.getPathInfo().substring(1);
+            validateNotBlank(pathInfo, "Код валюты отсутствует в адресе");
+
+            String pairCurrencies = pathInfo.toUpperCase();
+            validateCurrencyPairLength(pairCurrencies, "Валютная пара должна состоять из 6 символов");
+
+            String baseCurrency = pairCurrencies.substring(0, 3);
+            String targetCurrency = pairCurrencies.substring(3);
+            String body = request.getReader().readLine();
+            System.out.println("body: " + body);
+            validatePatchBodyRequest(body, "Отсутствует поле rate");
+            String rate = body.split("=")[1];
+
             PrintWriter printWriter = response.getWriter();
 
-            String rateParameter = request.getParameter("rate");
-            if ((rateParameter == null) || (rateParameter.equals(""))) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                printWriter.write("{\"message\": \"Отсутствует поле rate\"}");
+            validateNotBlank(baseCurrency, "Код валюты отсутствует в адресе");
+            validateNotBlank(targetCurrency, "Код валюты отсутствует в адресе");
+            validateNotBlank(rate, "rate не указан");
+            validateCodeLength(baseCurrency, "Код валюты должен состоять из трех букв");
+            validateCodeLength(targetCurrency, "Код валюты должен состоять из трех букв");
+            validateCodeValue(baseCurrency, "Код валюты должен состоять только из латинских букв");
+            validateCodeValue(targetCurrency, "Код валюты должен состоять только из латинских букв");
+            validateRateValue(rate, "Значение rate должно состоять только из цифр");
+
+            BigDecimal rateBD = new BigDecimal(rate);
+
+            Optional<ExchangeRate> optionalExchangeRate = exchangeRateService.getExchangeRateByCodes(baseCurrency, targetCurrency);
+            if (optionalExchangeRate.isEmpty()) {
+                throw new NoSuchElementException();
             } else {
-                try {
-                    double rate = Double.parseDouble(request.getParameter("rate"));
-                    if (rate <= 0) {
-                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        printWriter.write("{\"message\": \"Некорректное значение rate\"}");
-                    } else {
-                        response.setStatus(HttpServletResponse.SC_OK);
-                        printWriter.write(String.valueOf(rate));
-                        // TODO: change rate in DB
-                    }
-                } catch (NumberFormatException e) {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    printWriter.write("{\"message\": \"Rate должен быть числом\"}");
-                }
+                exchangeRateService.updateExchangeRate(baseCurrency, targetCurrency, rateBD);
+                Optional<ExchangeRate> updated = exchangeRateService.getExchangeRateByCodes(baseCurrency,targetCurrency);
+                ExchangeRate exchangeRate = updated.get();
+                response.setStatus(HttpServletResponse.SC_OK);
+                ExchangeRateDto exchangeRateDto = ExchangeRateDto.exchangeRateToDto(exchangeRate);
+                objectMapper.writeValue(printWriter, exchangeRateDto);
             }
 
         } else {

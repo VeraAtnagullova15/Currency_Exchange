@@ -1,4 +1,4 @@
-package filters;
+package org.example.currency_exchange.filters;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
