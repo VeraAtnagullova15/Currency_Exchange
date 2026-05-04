@@ -22,7 +22,7 @@ public class ValidationUtils {
         return pair.length() == CURRENCY_PAIR_LENGTH;
     }
 
-    public static boolean isValidRateType(String rate) {
+    public static boolean isValidRateAndAmountType(String rate) {
         return rate.matches("^[\\d.,]+$");
     }
 

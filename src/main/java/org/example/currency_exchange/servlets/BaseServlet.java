@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServlet;
 import org.example.currency_exchange.exceptions.ValidationException;
 import org.example.currency_exchange.service.CurrencyService;
 import org.example.currency_exchange.service.ExchangeRateService;
+import org.example.currency_exchange.service.ExchangeService;
 import org.example.currency_exchange.utils.ValidationUtils;
 
 public abstract class BaseServlet extends HttpServlet {
@@ -12,6 +13,7 @@ public abstract class BaseServlet extends HttpServlet {
     protected final ObjectMapper objectMapper = new ObjectMapper();
     protected final CurrencyService currencyService = new CurrencyService();
     protected final ExchangeRateService exchangeRateService = new ExchangeRateService();
+    protected final ExchangeService exchangeService = new ExchangeService();
 
     protected void validateCodeLength(String code, String message) throws ValidationException {
         if (!ValidationUtils.isValidLengthCode(code)) {
@@ -37,8 +39,8 @@ public abstract class BaseServlet extends HttpServlet {
         }
     }
 
-    protected void validateRateValue(String rate, String message) {
-        if (!ValidationUtils.isValidRateType(rate)) {
+    protected void validateRateAndAmountValue(String rate, String message) {
+        if (!ValidationUtils.isValidRateAndAmountType(rate)) {
             throw new ValidationException(message);
         }
     }

@@ -2,7 +2,6 @@ package org.example.currency_exchange.servlets;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.currency_exchange.dto.ExchangeRateDto;
@@ -78,7 +77,7 @@ public class ExchangeRateServlet extends BaseServlet {
             validateCodeLength(targetCurrency, "Код валюты должен состоять из трех букв");
             validateCodeValue(baseCurrency, "Код валюты должен состоять только из латинских букв");
             validateCodeValue(targetCurrency, "Код валюты должен состоять только из латинских букв");
-            validateRateValue(rate, "Значение rate должно состоять только из цифр");
+            validateRateAndAmountValue(rate, "Значение rate должно состоять из цифр");
 
             BigDecimal rateBD = new BigDecimal(rate);
 

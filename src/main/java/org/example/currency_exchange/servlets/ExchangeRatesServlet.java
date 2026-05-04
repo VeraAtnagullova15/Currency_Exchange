@@ -51,7 +51,7 @@ public class ExchangeRatesServlet extends BaseServlet {
         validateCodeLength(targetCurrencyCode, "Код валюты должен состоять из трех букв");
         validateCodeValue(baseCurrencyCode, "Код валюты должен состоять только из латинских букв");
         validateCodeValue(targetCurrencyCode, "Код валюты должен состоять только из латинских букв");
-        validateRateValue(rate, "Значение rate должно состоять только из цифр");
+        validateRateAndAmountValue(rate, "Значение rate должно состоять только из цифр");
 
         BigDecimal rateBD = new BigDecimal(rate);
         if (baseCurrencyCode.equals(targetCurrencyCode)) {
