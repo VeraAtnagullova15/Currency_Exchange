@@ -39,13 +39,13 @@ public abstract class BaseServlet extends HttpServlet {
         }
     }
 
-    protected void validateRateAndAmountValue(String rate, String message) {
+    protected void validateRateAndAmountValue(String rate, String message) throws ValidationException {
         if (!ValidationUtils.isValidRateAndAmountType(rate)) {
             throw new ValidationException(message);
         }
     }
 
-    protected void validatePatchBodyRequest(String body, String message) {
+    protected void validatePatchBodyRequest(String body, String message) throws ValidationException {
         if (!ValidationUtils.isValidRequestBody(body)) {
             throw new ValidationException(message);
         }

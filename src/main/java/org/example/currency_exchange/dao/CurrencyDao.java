@@ -36,7 +36,7 @@ public class CurrencyDao {
                 currencies.add(currency);
             }
         } catch (SQLException sqlException) {
-            throw new DataBaseException(sqlException.getMessage());
+            throw new DataBaseException("Ошибка базы данных");
         }
 
         return currencies;
@@ -62,7 +62,7 @@ public class CurrencyDao {
                 }
             }
         } catch (SQLException sqlException) {
-            throw new DataBaseException(sqlException.getMessage());
+            throw new DataBaseException("Ошибка базы данных");
         }
 
         return Optional.empty();
@@ -80,7 +80,10 @@ public class CurrencyDao {
 
             preparedStatement.executeUpdate();
         } catch (SQLException sqlException) {
-            throw new DataBaseException(sqlException.getMessage());
+            if (sqlException.getMessage().contains("UNIQUE constraint failed")) {
+                throw new DataBaseException("Валюта уже существует");
+            }
+            throw new DataBaseException("Ошибка базы данных");
         }
     }
 
@@ -103,7 +106,7 @@ public class CurrencyDao {
                 }
             }
         } catch (SQLException sqlException) {
-            throw new DataBaseException(sqlException.getMessage());
+            throw new DataBaseException("Ошибка базы данных");
         }
 
         return Optional.empty();

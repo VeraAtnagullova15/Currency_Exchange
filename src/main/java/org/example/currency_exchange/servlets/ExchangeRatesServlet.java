@@ -63,7 +63,7 @@ public class ExchangeRatesServlet extends BaseServlet {
 
         Optional<ExchangeRate> optionalExchangeRate = exchangeRateService.getExchangeRateByCodes(baseCurrencyCode, targetCurrencyCode);
         if (optionalExchangeRate.isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Обменный курс не найден");
         } else {
             ExchangeRate exchangeRate = optionalExchangeRate.get();
             ExchangeRateDto exchangeRateDto = ExchangeRateDto.exchangeRateToDto(exchangeRate);

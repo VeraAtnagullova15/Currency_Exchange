@@ -31,7 +31,7 @@ public class CurrencyServlet extends BaseServlet {
 
 
         if (optional.isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Валюта не найдена");
         } else {
             Currency currency = optional.get();
             CurrencyDto currencyDto = CurrencyDto.currencyToDto(currency);

@@ -24,18 +24,21 @@ public class ExceptionCatchFilter implements Filter {
             filterChain.doFilter(servletRequest, servletResponse);
         } catch (NoSuchElementException elementException) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            printWriter.write("{\"message\": \"Указанная валюта не найдена\"}");
+            printWriter.write("{\"message\": \"" + elementException.getMessage() +"\"}");
         } catch (ValidationException validationException) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             printWriter.write("{\"message\": \"" + validationException.getMessage() + "\"}");
         } catch (DataBaseException dataBaseException) {
-            if (dataBaseException.getMessage().contains("UNIQUE constraint failed")) {
+            if (dataBaseException.getMessage().contains("существует")) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                printWriter.write("{\"message\": \"Поле с такими данными уже существует\"}");
+                printWriter.write("{\"message\": \"" + dataBaseException.getMessage() + "\"}");
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                printWriter.write("{\"message\": \"Ошибка базы данных\"}");
+                printWriter.write("{\"message\": \"" + dataBaseException.getMessage() + "\"}");
             }
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            printWriter.write("{\"message\": \"Ошибка выполнения запроса\"}");
         }
     }
 }

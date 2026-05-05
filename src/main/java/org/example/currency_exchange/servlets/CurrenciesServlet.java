@@ -51,7 +51,7 @@ public class CurrenciesServlet extends BaseServlet {
         currencyService.putCurrencyIntoDB(code, name, sign);
         Optional<Currency> optional = currencyService.getCurrencyByCode(code);
         if (optional.isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Валюта не найдена");
         } else {
             Currency currency = optional.get();
             CurrencyDto currencyDto = CurrencyDto.currencyToDto(currency);

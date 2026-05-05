@@ -10,6 +10,7 @@ import org.example.currency_exchange.models.ExchangeRate;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -40,7 +41,7 @@ public class ExchangeRateServlet extends BaseServlet {
         Optional<ExchangeRate> optional = exchangeRateService.getExchangeRateByCodes(baseCurrency, targetCurrency);
 
         if (optional.isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Обменный курс не найден");
         } else {
             ExchangeRate exchangeRate = optional.get();
             ExchangeRateDto exchangeRateDto = ExchangeRateDto.exchangeRateToDto(exchangeRate);
@@ -83,7 +84,7 @@ public class ExchangeRateServlet extends BaseServlet {
 
             Optional<ExchangeRate> optionalExchangeRate = exchangeRateService.getExchangeRateByCodes(baseCurrency, targetCurrency);
             if (optionalExchangeRate.isEmpty()) {
-                throw new NoSuchElementException();
+                throw new NoSuchElementException("Обменный курс не найден");
             } else {
                 exchangeRateService.updateExchangeRate(baseCurrency, targetCurrency, rateBD);
                 Optional<ExchangeRate> updated = exchangeRateService.getExchangeRateByCodes(baseCurrency,targetCurrency);

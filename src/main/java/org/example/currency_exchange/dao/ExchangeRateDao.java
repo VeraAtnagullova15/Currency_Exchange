@@ -88,7 +88,7 @@ public class ExchangeRateDao {
                 }
             }
         } catch (SQLException sqlException) {
-            throw new DataBaseException(sqlException.getMessage());
+            throw new DataBaseException("Ошибка базы данных");
         }
 
         return Optional.empty();
@@ -112,7 +112,10 @@ public class ExchangeRateDao {
             preparedStatement.executeUpdate();
 
         } catch (SQLException sqlException) {
-            throw new DataBaseException(sqlException.getMessage());
+            if (sqlException.getMessage().contains("UNIQUE constraint failed")) {
+                throw new DataBaseException("Обменный курс уже существует");
+            }
+            throw new DataBaseException("Ошибка базы данных");
         }
     }
 
@@ -134,7 +137,7 @@ public class ExchangeRateDao {
             preparedStatement.executeUpdate();
 
         } catch (SQLException sqlException) {
-            throw new DataBaseException(sqlException.getMessage());
+            throw new DataBaseException("Ошибка базы данных");
         }
     }
 
