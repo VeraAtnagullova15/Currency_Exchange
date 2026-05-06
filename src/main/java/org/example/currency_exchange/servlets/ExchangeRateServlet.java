@@ -1,22 +1,43 @@
 package org.example.currency_exchange.servlets;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.currency_exchange.dao.CurrencyDao;
+import org.example.currency_exchange.dao.ExchangeRateDao;
 import org.example.currency_exchange.dto.ExchangeRateDto;
 import org.example.currency_exchange.models.ExchangeRate;
+import org.example.currency_exchange.service.CurrencyService;
+import org.example.currency_exchange.service.ExchangeRateService;
+import org.example.currency_exchange.service.ExchangeService;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static org.example.currency_exchange.utils.ValidationUtils.*;
+
 
 @WebServlet("/exchangeRate/*")
-public class ExchangeRateServlet extends BaseServlet {
+public class ExchangeRateServlet extends HttpServlet {
+
+    private ObjectMapper objectMapper;
+    private ExchangeRateService exchangeRateService;
+
+    @Override
+    public void init() throws ServletException{
+        this.objectMapper = new ObjectMapper();
+        this.exchangeRateService = new ExchangeRateService(new ExchangeRateDao(new CurrencyDao()), new CurrencyDao());
+    }
+
+    public ExchangeRateServlet() {
+    }
+
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 

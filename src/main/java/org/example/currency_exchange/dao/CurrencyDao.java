@@ -81,7 +81,7 @@ public class CurrencyDao {
             preparedStatement.executeUpdate();
         } catch (SQLException sqlException) {
             if (sqlException.getMessage().contains("UNIQUE constraint failed")) {
-                throw new DataBaseException("Валюта уже существует");
+                throw new DataBaseException("Валюта " + code + " уже существует");
             }
             throw new DataBaseException("Ошибка базы данных");
         }

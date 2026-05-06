@@ -9,7 +9,12 @@ import java.util.Optional;
 
 public class CurrencyService {
 
-    private final CurrencyDao currencyDao = new CurrencyDao();
+    private final CurrencyDao currencyDao;
+
+    public CurrencyService(CurrencyDao currencyDao) {
+        this.currencyDao = currencyDao;
+    }
+
 
     public List<Currency> getAllCurrencies () throws DataBaseException {
         return currencyDao.getAllCurrencies();

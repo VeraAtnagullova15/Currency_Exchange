@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public class ExchangeRateDao {
 
-    private static final CurrencyDao currencyDao = new CurrencyDao();
+    private final CurrencyDao currencyDao;
     private static final String SQL_GET_ALL_EXCHANGE_RATES = "SELECT * FROM ExchangeRates";
     private static final String SQL_GET_EXCHANGE_RATE = """
             SELECT ex.ID, ex.BaseCurrencyId, ex.TargetCurrencyId, ex.Rate
@@ -27,6 +27,10 @@ public class ExchangeRateDao {
 
     private static final String SQL_UPDATE_EXCHANGE_RATE = "UPDATE ExchangeRates SET Rate=? " +
             "WHERE BaseCurrencyId=? AND TargetCurrencyId=?";
+
+    public ExchangeRateDao(CurrencyDao currencyDao) {
+        this.currencyDao = currencyDao;
+    }
 
 
     public List<ExchangeRate> getAllExchangeRates() throws DataBaseException {
@@ -44,9 +48,9 @@ public class ExchangeRateDao {
                 exchangeRate.setRate(resultSet.getBigDecimal("Rate"));
 
                 Currency baseCurrency = currencyDao.getCurrencyById(resultSet.getInt("BaseCurrencyId"))
-                        .orElseThrow(NoSuchElementException::new);
+                        .orElseThrow(() -> new NoSuchElementException("Валюта не найдена"));
                 Currency targetCurrency = currencyDao.getCurrencyById(resultSet.getInt("TargetCurrencyId"))
-                        .orElseThrow(NoSuchElementException::new);
+                        .orElseThrow(() -> new NoSuchElementException("Валюта не найдена"));
 
                 exchangeRate.setBaseCurrency(baseCurrency);
                 exchangeRate.setTargetCurrency(targetCurrency);
@@ -77,9 +81,9 @@ public class ExchangeRateDao {
                     exchangeRate.setRate(resultSet.getBigDecimal("Rate"));
 
                     Currency baseCurrency = currencyDao.getCurrencyById(resultSet.getInt("BaseCurrencyId"))
-                            .orElseThrow(NoSuchElementException::new);
+                            .orElseThrow(() -> new NoSuchElementException("Валюта " + base + "не найдена"));
                     Currency targetCurrency = currencyDao.getCurrencyById(resultSet.getInt("TargetCurrencyId"))
-                            .orElseThrow(NoSuchElementException::new);
+                            .orElseThrow(() -> new NoSuchElementException("Валюта " + target + " не найдена"));
 
                     exchangeRate.setBaseCurrency(baseCurrency);
                     exchangeRate.setTargetCurrency(targetCurrency);
@@ -95,18 +99,13 @@ public class ExchangeRateDao {
 
     }
 
-    public void putExchangeRateIntoDB(String base, String target, BigDecimal rate) throws DataBaseException {
-
-        Currency baseCurrency = currencyDao.getCurrencyByCode(base)
-                .orElseThrow(NoSuchElementException::new);
-        Currency targetCurrency = currencyDao.getCurrencyByCode(target)
-                .orElseThrow(NoSuchElementException::new);
+    public void putExchangeRateIntoDB(int baseId, int targetId, BigDecimal rate) throws DataBaseException {
 
         try(Connection connection = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_PUT_EXCHANGE_RATE);) {
 
-            preparedStatement.setInt(1, baseCurrency.getId());
-            preparedStatement.setInt(2, targetCurrency.getId());
+            preparedStatement.setInt(1, baseId);
+            preparedStatement.setInt(2, targetId);
             preparedStatement.setBigDecimal(3, rate);
 
             preparedStatement.executeUpdate();
@@ -120,19 +119,14 @@ public class ExchangeRateDao {
     }
 
 
-    public void updateExchangeRate(String base, String target, BigDecimal rate) {
-
-        Currency baseCurrency = currencyDao.getCurrencyByCode(base)
-                .orElseThrow(NoSuchElementException::new);
-        Currency targetCurrency = currencyDao.getCurrencyByCode(target)
-                .orElseThrow(NoSuchElementException::new);
+    public void updateExchangeRate(int baseId, int targetId, BigDecimal rate) {
 
         try(Connection connection = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_EXCHANGE_RATE);) {
 
             preparedStatement.setBigDecimal(1, rate);
-            preparedStatement.setInt(2, baseCurrency.getId());
-            preparedStatement.setInt(3, targetCurrency.getId());
+            preparedStatement.setInt(2, baseId);
+            preparedStatement.setInt(3, targetId);
 
             preparedStatement.executeUpdate();
 

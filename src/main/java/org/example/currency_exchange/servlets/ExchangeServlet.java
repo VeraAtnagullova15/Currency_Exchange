@@ -1,18 +1,39 @@
 package org.example.currency_exchange.servlets;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.currency_exchange.dao.CurrencyDao;
+import org.example.currency_exchange.dao.ExchangeRateDao;
 import org.example.currency_exchange.dto.ExchangeResult;
+import org.example.currency_exchange.service.ExchangeRateService;
+import org.example.currency_exchange.service.ExchangeService;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 
+import static org.example.currency_exchange.utils.ValidationUtils.*;
+
 
 @WebServlet("/exchange")
-public class ExchangeServlet extends BaseServlet {
+public class ExchangeServlet extends HttpServlet {
+
+    private ObjectMapper objectMapper;
+    private ExchangeService exchangeService;
+
+    @Override
+    public void init() throws ServletException{
+        this.objectMapper = new ObjectMapper();
+        this.exchangeService = new ExchangeService(new ExchangeRateDao(new CurrencyDao()));
+    }
+
+    public ExchangeServlet() {
+    }
+
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -38,6 +59,5 @@ public class ExchangeServlet extends BaseServlet {
         objectMapper.writeValue(printWriter, result);
 
     }
-
 
 }
