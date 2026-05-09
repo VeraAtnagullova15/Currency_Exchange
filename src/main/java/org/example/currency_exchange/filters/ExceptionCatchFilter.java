@@ -2,6 +2,8 @@ package org.example.currency_exchange.filters;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.currency_exchange.exceptions.DataBaseException;
 import org.example.currency_exchange.exceptions.ValidationException;
