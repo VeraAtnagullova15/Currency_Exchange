@@ -33,10 +33,10 @@ public class ExchangeService {
 
         if (directOptional.isPresent()) {
             ExchangeRate directExchangeRate = directOptional.get();
-            BigDecimal rate = directExchangeRate.getRate().setScale(6, RoundingMode.HALF_UP);
+            BigDecimal rate = directExchangeRate.getRate();
             BigDecimal convertedAmount = amount.multiply(rate).setScale(2, RoundingMode.HALF_UP);
             ExchangeResult result = new ExchangeResult(directExchangeRate.getBaseCurrency(), directExchangeRate.getTargetCurrency(),
-                    rate, amount, convertedAmount);
+                    rate.setScale(2, RoundingMode.HALF_UP), amount, convertedAmount);
             return Optional.of(result);
         }
         return Optional.empty();
@@ -52,7 +52,7 @@ public class ExchangeService {
             BigDecimal reverseRate = BigDecimal.ONE.divide(rate, 6, RoundingMode.HALF_UP);
             BigDecimal convertedAmount = amount.multiply(reverseRate).setScale(2, RoundingMode.HALF_UP);
             ExchangeResult result = new ExchangeResult(reverseExchangeRate.getBaseCurrency(), reverseExchangeRate.getTargetCurrency(),
-                    reverseRate, amount, convertedAmount);
+                    reverseRate.setScale(2, RoundingMode.HALF_UP), amount, convertedAmount);
             return Optional.of(result);
         }
         return Optional.empty();
@@ -65,12 +65,12 @@ public class ExchangeService {
         Optional<ExchangeRate> USDtoOptional = exchangeRateDao.getExchangeRatesByCodes(USD, to);
 
         if (USDfromOptional.isPresent() && USDtoOptional.isPresent()) {
-            BigDecimal UsdFromRate = USDfromOptional.get().getRate().setScale(6,RoundingMode.HALF_UP);
-            BigDecimal UsdToRate = USDtoOptional.get().getRate().setScale(6, RoundingMode.HALF_UP);
+            BigDecimal UsdFromRate = USDfromOptional.get().getRate();
+            BigDecimal UsdToRate = USDtoOptional.get().getRate();
             BigDecimal rate = UsdToRate.divide(UsdFromRate, 6, RoundingMode.HALF_UP);
             BigDecimal convertedAmount = amount.multiply(rate).setScale(2, RoundingMode.HALF_UP);
             ExchangeResult result = new ExchangeResult(USDfromOptional.get().getTargetCurrency(),
-                    USDtoOptional.get().getTargetCurrency(), rate, amount, convertedAmount);
+                    USDtoOptional.get().getTargetCurrency(), rate.setScale(2, RoundingMode.HALF_UP), amount, convertedAmount);
             return Optional.of(result);
         }
         return Optional.empty();
