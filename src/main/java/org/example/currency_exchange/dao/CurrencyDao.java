@@ -1,5 +1,6 @@
 package org.example.currency_exchange.dao;
 
+import org.example.currency_exchange.exceptions.AlreadyExistsException;
 import org.example.currency_exchange.exceptions.DataBaseException;
 import org.example.currency_exchange.models.Currency;
 
@@ -14,9 +15,8 @@ public class CurrencyDao {
     private static final String SQL_GET_CURRENCY_BY_CODE = "SELECT * FROM Currencies WHERE Code=?";
     private static final String SQL_PUT_CURRENCY = "INSERT INTO Currencies(Code, FullName, Sign)\n" +
             "VALUES(?, ?, ?)";
-    private static final String SQL_GET_CURRENCY_BY_ID = "SELECT * FROM Currencies WHERE ID=?";
 
-    public List<Currency> getAllCurrencies() throws DataBaseException {
+    public List<Currency> getAllCurrencies() {
 
         List<Currency> currencies = new ArrayList<>();
 
@@ -43,7 +43,7 @@ public class CurrencyDao {
     }
 
 
-    public Optional<Currency> getCurrencyByCode(String code) throws DataBaseException {
+    public Optional<Currency> getCurrencyByCode(String code) {
 
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_CURRENCY_BY_CODE);) {
@@ -69,7 +69,7 @@ public class CurrencyDao {
 
     }
 
-    public void putCurrencyIntoDB(String code,String name, String sign) throws DataBaseException {
+    public void putCurrencyIntoDB(String code,String name, String sign) {
 
         try(Connection connection = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_PUT_CURRENCY);) {
@@ -81,36 +81,10 @@ public class CurrencyDao {
             preparedStatement.executeUpdate();
         } catch (SQLException sqlException) {
             if (sqlException.getMessage().contains("UNIQUE constraint failed")) {
-                throw new DataBaseException("Валюта " + code + " уже существует");
+                throw new AlreadyExistsException("Валюта " + code + " уже существует");
             }
             throw new DataBaseException("Ошибка базы данных");
         }
-    }
-
-    public Optional<Currency> getCurrencyById(int id) throws DataBaseException {
-
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_CURRENCY_BY_ID);) {
-
-            preparedStatement.setInt(1, id);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery();) {
-
-                if (resultSet.next()) {
-                    Currency currency = new Currency();
-                    currency.setId(resultSet.getInt("ID"));
-                    currency.setCode(resultSet.getString("Code"));
-                    currency.setFullName(resultSet.getString("FullName"));
-                    currency.setSign(resultSet.getString("Sign"));
-                    return Optional.of(currency);
-                }
-            }
-        } catch (SQLException sqlException) {
-            throw new DataBaseException("Ошибка базы данных");
-        }
-
-        return Optional.empty();
-
     }
 
 

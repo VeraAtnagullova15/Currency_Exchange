@@ -26,8 +26,8 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException{
-        this.objectMapper = new ObjectMapper();
-        this.currencyService = new CurrencyService(new CurrencyDao());
+        objectMapper = (ObjectMapper)getServletContext().getAttribute("objectMapper");
+        currencyService = (CurrencyService)getServletContext().getAttribute("currencyService");
     }
 
     public CurrencyServlet() {

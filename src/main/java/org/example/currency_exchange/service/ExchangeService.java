@@ -36,7 +36,7 @@ public class ExchangeService {
             BigDecimal rate = directExchangeRate.getRate();
             BigDecimal convertedAmount = amount.multiply(rate).setScale(2, RoundingMode.HALF_UP);
             ExchangeResult result = new ExchangeResult(directExchangeRate.getBaseCurrency(), directExchangeRate.getTargetCurrency(),
-                    rate.setScale(2, RoundingMode.HALF_UP), amount, convertedAmount);
+                    rate, amount, convertedAmount);
             return Optional.of(result);
         }
         return Optional.empty();
@@ -52,7 +52,7 @@ public class ExchangeService {
             BigDecimal reverseRate = BigDecimal.ONE.divide(rate, 6, RoundingMode.HALF_UP);
             BigDecimal convertedAmount = amount.multiply(reverseRate).setScale(2, RoundingMode.HALF_UP);
             ExchangeResult result = new ExchangeResult(reverseExchangeRate.getBaseCurrency(), reverseExchangeRate.getTargetCurrency(),
-                    reverseRate.setScale(2, RoundingMode.HALF_UP), amount, convertedAmount);
+                    reverseRate, amount, convertedAmount);
             return Optional.of(result);
         }
         return Optional.empty();
@@ -70,7 +70,7 @@ public class ExchangeService {
             BigDecimal rate = UsdToRate.divide(UsdFromRate, 6, RoundingMode.HALF_UP);
             BigDecimal convertedAmount = amount.multiply(rate).setScale(2, RoundingMode.HALF_UP);
             ExchangeResult result = new ExchangeResult(USDfromOptional.get().getTargetCurrency(),
-                    USDtoOptional.get().getTargetCurrency(), rate.setScale(2, RoundingMode.HALF_UP), amount, convertedAmount);
+                    USDtoOptional.get().getTargetCurrency(), rate, amount, convertedAmount);
             return Optional.of(result);
         }
         return Optional.empty();

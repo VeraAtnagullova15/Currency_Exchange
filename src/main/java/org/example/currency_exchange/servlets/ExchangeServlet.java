@@ -27,8 +27,8 @@ public class ExchangeServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException{
-        this.objectMapper = new ObjectMapper();
-        this.exchangeService = new ExchangeService(new ExchangeRateDao(new CurrencyDao()));
+        objectMapper = (ObjectMapper)getServletContext().getAttribute("objectMapper");
+        exchangeService = (ExchangeService)getServletContext().getAttribute("exchangeService");
     }
 
     public ExchangeServlet() {
