@@ -21,7 +21,7 @@ public class AppComtextListener implements ServletContextListener {
 
         ObjectMapper objectMapper = new ObjectMapper();
         CurrencyDao currencyDao = new CurrencyDao();
-        ExchangeRateDao exchangeRateDao = new ExchangeRateDao(currencyDao);
+        ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
 
         CurrencyService currencyService = new CurrencyService(currencyDao);
         ExchangeRateService exchangeRateService = new ExchangeRateService(exchangeRateDao, currencyDao);

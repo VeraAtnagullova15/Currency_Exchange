@@ -6,10 +6,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.currency_exchange.dao.CurrencyDao;
-import org.example.currency_exchange.dao.ExchangeRateDao;
+import lombok.NoArgsConstructor;
 import org.example.currency_exchange.dto.ExchangeResult;
-import org.example.currency_exchange.service.ExchangeRateService;
 import org.example.currency_exchange.service.ExchangeService;
 
 import java.io.IOException;
@@ -19,6 +17,7 @@ import java.math.BigDecimal;
 import static org.example.currency_exchange.utils.ValidationUtils.*;
 
 
+@NoArgsConstructor
 @WebServlet("/exchange")
 public class ExchangeServlet extends HttpServlet {
 
@@ -30,10 +29,6 @@ public class ExchangeServlet extends HttpServlet {
         objectMapper = (ObjectMapper)getServletContext().getAttribute("objectMapper");
         exchangeService = (ExchangeService)getServletContext().getAttribute("exchangeService");
     }
-
-    public ExchangeServlet() {
-    }
-
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 

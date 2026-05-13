@@ -1,9 +1,12 @@
 package org.example.currency_exchange.dao;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.currency_exchange.exceptions.AlreadyExistsException;
 import org.example.currency_exchange.exceptions.DataBaseException;
 import org.example.currency_exchange.models.Currency;
 import org.example.currency_exchange.models.ExchangeRate;
+import org.sqlite.SQLiteErrorCode;
+import org.sqlite.SQLiteException;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -11,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 public class ExchangeRateDao {
 
-    private final CurrencyDao currencyDao;
     private static final String SQL_GET_ALL_EXCHANGE_RATES = """
 SELECT er.ID AS er_id, er.Rate AS rate, 
        base.ID AS base_id, base.Code AS base_code, base.FullName AS base_name, base.Sign AS base_sign, 
@@ -37,10 +40,6 @@ JOIN Currencies target ON er.TargetCurrencyId = target.ID
 
     private static final String SQL_UPDATE_EXCHANGE_RATE = "UPDATE ExchangeRates SET Rate=? " +
             "WHERE BaseCurrencyId=? AND TargetCurrencyId=?";
-
-    public ExchangeRateDao(CurrencyDao currencyDao) {
-        this.currencyDao = currencyDao;
-    }
 
 
     public List<ExchangeRate> getAllExchangeRates() {
@@ -74,6 +73,7 @@ JOIN Currencies target ON er.TargetCurrencyId = target.ID
                 exchangeRates.add(exchangeRate);
             }
         } catch (SQLException sqlException) {
+            log.error("Ошибка при получении всех обменных курсов", sqlException);
             throw new DataBaseException("Ошибка базы данных");
         }
 
@@ -115,6 +115,7 @@ JOIN Currencies target ON er.TargetCurrencyId = target.ID
                 }
             }
         } catch (SQLException sqlException) {
+            log.error("Ошибка при получении обменного курса по коду: {}", base, target, sqlException);
             throw new DataBaseException("Ошибка базы данных");
         }
 
@@ -134,9 +135,13 @@ JOIN Currencies target ON er.TargetCurrencyId = target.ID
             preparedStatement.executeUpdate();
 
         } catch (SQLException sqlException) {
-            if (sqlException.getMessage().contains("UNIQUE constraint failed")) {
-                throw new AlreadyExistsException("Обменный курс уже существует");
+            if (sqlException instanceof SQLiteException sqLiteException) {
+                if (sqLiteException.getResultCode() == SQLiteErrorCode.SQLITE_CONSTRAINT_UNIQUE) {
+                    log.error("Ошибка добавления курса обмена", sqLiteException );
+                    throw new AlreadyExistsException("Обменный курс уже существует");
+                }
             }
+            log.error("Ошибка при добавлении нового курса обмена", sqlException);
             throw new DataBaseException("Ошибка базы данных");
         }
     }
@@ -154,6 +159,7 @@ JOIN Currencies target ON er.TargetCurrencyId = target.ID
             preparedStatement.executeUpdate();
 
         } catch (SQLException sqlException) {
+            log.error("Ошибка при обновлении курса обмена", sqlException);
             throw new DataBaseException("Ошибка базы данных");
         }
     }

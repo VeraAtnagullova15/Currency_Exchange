@@ -1,5 +1,6 @@
 package org.example.currency_exchange.service;
 
+import lombok.AllArgsConstructor;
 import org.example.currency_exchange.dao.ExchangeRateDao;
 import org.example.currency_exchange.dto.ExchangeResult;
 import org.example.currency_exchange.models.ExchangeRate;
@@ -9,13 +10,11 @@ import java.math.RoundingMode;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+@AllArgsConstructor
 public class ExchangeService {
 
-    private final ExchangeRateDao exchangeRateDao;
+    private ExchangeRateDao exchangeRateDao;
 
-    public ExchangeService(ExchangeRateDao exchangeRateDao) {
-        this.exchangeRateDao = exchangeRateDao;
-    }
 
     public ExchangeResult exchange(String from, String to, BigDecimal amount) {
 

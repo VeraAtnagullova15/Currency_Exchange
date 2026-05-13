@@ -1,5 +1,6 @@
 package org.example.currency_exchange.service;
 
+import lombok.AllArgsConstructor;
 import org.example.currency_exchange.dao.CurrencyDao;
 import org.example.currency_exchange.exceptions.DataBaseException;
 import org.example.currency_exchange.models.Currency;
@@ -7,13 +8,10 @@ import org.example.currency_exchange.models.Currency;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 public class CurrencyService {
 
-    private final CurrencyDao currencyDao;
-
-    public CurrencyService(CurrencyDao currencyDao) {
-        this.currencyDao = currencyDao;
-    }
+    private CurrencyDao currencyDao;
 
 
     public List<Currency> getAllCurrencies () throws DataBaseException {

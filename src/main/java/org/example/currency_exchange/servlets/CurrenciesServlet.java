@@ -3,6 +3,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.currency_exchange.dao.CurrencyDao;
 import org.example.currency_exchange.dto.CurrencyDto;
 import org.example.currency_exchange.models.Currency;
@@ -17,6 +19,8 @@ import java.util.Optional;
 
 import static org.example.currency_exchange.utils.ValidationUtils.*;
 
+
+@NoArgsConstructor
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
 
@@ -27,9 +31,6 @@ public class CurrenciesServlet extends HttpServlet {
     public void init() throws ServletException{
         objectMapper = (ObjectMapper)getServletContext().getAttribute("objectMapper");
         currencyService = (CurrencyService)getServletContext().getAttribute("currencyService");
-    }
-
-    public CurrenciesServlet() {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

@@ -1,14 +1,18 @@
 package org.example.currency_exchange.dao;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.currency_exchange.exceptions.AlreadyExistsException;
 import org.example.currency_exchange.exceptions.DataBaseException;
 import org.example.currency_exchange.models.Currency;
+import org.sqlite.SQLiteErrorCode;
+import org.sqlite.SQLiteException;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 public class CurrencyDao {
 
     private static final String SQL_GET_ALL_CURRENCIES = "SELECT * FROM Currencies";
@@ -36,6 +40,7 @@ public class CurrencyDao {
                 currencies.add(currency);
             }
         } catch (SQLException sqlException) {
+            log.error("Ошибка при получении всех валют", sqlException);
             throw new DataBaseException("Ошибка базы данных");
         }
 
@@ -62,6 +67,7 @@ public class CurrencyDao {
                 }
             }
         } catch (SQLException sqlException) {
+            log.error("Ошибка при получении валюты по коду: {}", code, sqlException);
             throw new DataBaseException("Ошибка базы данных");
         }
 
@@ -80,9 +86,13 @@ public class CurrencyDao {
 
             preparedStatement.executeUpdate();
         } catch (SQLException sqlException) {
-            if (sqlException.getMessage().contains("UNIQUE constraint failed")) {
-                throw new AlreadyExistsException("Валюта " + code + " уже существует");
+            if (sqlException instanceof SQLiteException sqLiteException) {
+                if (sqLiteException.getResultCode() == SQLiteErrorCode.SQLITE_CONSTRAINT_UNIQUE) {
+                    log.error("Ошибка добавления валюты", code, sqLiteException);
+                    throw new AlreadyExistsException("Валюта " + code + " уже существует");
+                }
             }
+            log.error("Ошибка при добавлении валюты", code, sqlException);
             throw new DataBaseException("Ошибка базы данных");
         }
     }

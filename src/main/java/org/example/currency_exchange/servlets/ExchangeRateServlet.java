@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NoArgsConstructor;
 import org.example.currency_exchange.dao.CurrencyDao;
 import org.example.currency_exchange.dao.ExchangeRateDao;
 import org.example.currency_exchange.dto.ExchangeRateDto;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import static org.example.currency_exchange.utils.ValidationUtils.*;
 
 
+@NoArgsConstructor
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
 
@@ -34,10 +36,6 @@ public class ExchangeRateServlet extends HttpServlet {
         objectMapper = (ObjectMapper)getServletContext().getAttribute("objectMapper");
         exchangeRateService = (ExchangeRateService)getServletContext().getAttribute("exchangeRateService");
     }
-
-    public ExchangeRateServlet() {
-    }
-
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -86,7 +84,6 @@ public class ExchangeRateServlet extends HttpServlet {
             String baseCurrency = pairCurrencies.substring(0, 3);
             String targetCurrency = pairCurrencies.substring(3);
             String body = request.getReader().readLine();
-            System.out.println("body: " + body);
             validatePatchBodyRequest(body, "Отсутствует поле rate");
             String rate = body.split("=")[1];
 

@@ -1,5 +1,6 @@
 package org.example.currency_exchange.service;
 
+import lombok.AllArgsConstructor;
 import org.example.currency_exchange.dao.CurrencyDao;
 import org.example.currency_exchange.dao.ExchangeRateDao;
 import org.example.currency_exchange.exceptions.DataBaseException;
@@ -11,15 +12,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+
+@AllArgsConstructor
 public class ExchangeRateService {
 
-    private final ExchangeRateDao exchangeRateDao;
-    private final CurrencyDao currencyDao;
-
-    public ExchangeRateService(ExchangeRateDao exchangeRateDao, CurrencyDao currencyDao) {
-        this.exchangeRateDao = exchangeRateDao;
-        this.currencyDao = currencyDao;
-    }
+    private ExchangeRateDao exchangeRateDao;
+    private CurrencyDao currencyDao;
 
     public List<ExchangeRate> getAllExchangeRates() throws DataBaseException {
         return exchangeRateDao.getAllExchangeRates();
