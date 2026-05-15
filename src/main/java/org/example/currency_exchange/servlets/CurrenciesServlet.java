@@ -3,26 +3,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.example.currency_exchange.dao.CurrencyDao;
-import org.example.currency_exchange.dto.CurrencyDto;
+import org.example.currency_exchange.dto.CurrencyRequestDto;
+import org.example.currency_exchange.dto.CurrencyResponseDto;
 import org.example.currency_exchange.models.Currency;
 import org.example.currency_exchange.service.CurrencyService;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.example.currency_exchange.utils.ValidationUtils.*;
-
-
-@NoArgsConstructor
 @WebServlet("/currencies")
-public class CurrenciesServlet extends HttpServlet {
+public class CurrenciesServlet extends BaseServlet {
 
     private ObjectMapper objectMapper;
     private CurrencyService currencyService;
@@ -35,34 +28,30 @@ public class CurrenciesServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        PrintWriter printWriter = response.getWriter();
-
         List<Currency> currencies = currencyService.getAllCurrencies();
-        List<CurrencyDto> currencyDtos = new ArrayList<>();
+        List<CurrencyResponseDto> currencyResponseDtos = new ArrayList<>();
         for (Currency currency : currencies) {
-            currencyDtos.add(CurrencyDto.currencyToDto(currency));
+            currencyResponseDtos.add(CurrencyResponseDto.currencyToDto(currency));
         }
         response.setStatus(HttpServletResponse.SC_OK);
-        objectMapper.writeValue(printWriter, currencyDtos);
+        objectMapper.writeValue(getWriter(response), currencyResponseDtos);
     }
 
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        String name = request.getParameter("name");
-        String code = request.getParameter("code");
-        String sign = request.getParameter("sign");
+        String name = extractNotNullParameter(request, "name");
+        String code = extractNotNullParameter(request, "code");
+        String sign = extractNotNullParameter(request, "sign");
         code = code.toUpperCase();
 
-        PrintWriter printWriter = response.getWriter();
+        CurrencyRequestDto currencyRequest = new CurrencyRequestDto();
+        currencyRequest.setName(name);
+        currencyRequest.setCode(code);
+        currencyRequest.setSign(sign);
 
-        validateCodeLength(code, "Код валюты должен состоять из трех букв");
-        validateNotBlank(code, "Отсутствует поле code");
-        validateNotBlank(name, "Отсутствует поле name");
-        validateNotBlank(sign, "Отсутствует поле sign");
-        validateCodeValue(code, "Код валюты должен состоять только из латинских букв");
-
+        currencyRequest.validateCurrencyRequest();
 
         response.setStatus(HttpServletResponse.SC_CREATED);
 
@@ -72,8 +61,8 @@ public class CurrenciesServlet extends HttpServlet {
             throw new NoSuchElementException("Валюта не найдена");
         } else {
             Currency currency = optional.get();
-            CurrencyDto currencyDto = CurrencyDto.currencyToDto(currency);
-            objectMapper.writeValue(printWriter, currencyDto);
+            CurrencyResponseDto currencyResponseDto = CurrencyResponseDto.currencyToDto(currency);
+            objectMapper.writeValue(getWriter(response), currencyResponseDto);
 
         }
     }

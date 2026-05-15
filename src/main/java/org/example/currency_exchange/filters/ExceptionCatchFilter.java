@@ -37,6 +37,10 @@ public class ExceptionCatchFilter implements Filter {
             log.warn("Поле уже существует", existsException);
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             printWriter.write("{\"message\": \"" + existsException.getMessage() + "\"}");
+        } catch (IllegalArgumentException argumentException) {
+            log.error("Отсутствует поле в запросе", argumentException);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            printWriter.write("{\"message\": \"" + argumentException.getMessage() + "\"}");
         } catch (DataBaseException dataBaseException) {
             log.error("Ошибка при обращении к БД");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

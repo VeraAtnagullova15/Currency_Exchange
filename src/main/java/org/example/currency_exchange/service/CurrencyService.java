@@ -14,15 +14,15 @@ public class CurrencyService {
     private CurrencyDao currencyDao;
 
 
-    public List<Currency> getAllCurrencies () throws DataBaseException {
+    public List<Currency> getAllCurrencies () {
         return currencyDao.getAllCurrencies();
     }
 
-    public Optional<Currency> getCurrencyByCode(String code) throws DataBaseException {
+    public Optional<Currency> getCurrencyByCode(String code) {
         return currencyDao.getCurrencyByCode(code);
     }
 
-    public void putCurrencyIntoDB(String code, String name, String sign) throws DataBaseException {
+    public void putCurrencyIntoDB(String code, String name, String sign)  {
         currencyDao.putCurrencyIntoDB(code, name, sign);
     }
 }

@@ -3,28 +3,22 @@ package org.example.currency_exchange.servlets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.NoArgsConstructor;
-import org.example.currency_exchange.dto.ExchangeRateDto;
+import org.example.currency_exchange.dto.ExchangeRateResponseDto;
+import org.example.currency_exchange.dto.ExchangeRatesRequestDto;
 import org.example.currency_exchange.models.ExchangeRate;
 import org.example.currency_exchange.service.ExchangeRateService;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.example.currency_exchange.utils.ValidationUtils.*;
-
-
-@NoArgsConstructor
 @WebServlet("/exchangeRates")
-public class ExchangeRatesServlet extends HttpServlet {
+public class ExchangeRatesServlet extends BaseServlet {
 
     private ObjectMapper objectMapper;
     private ExchangeRateService exchangeRateService;
@@ -37,37 +31,30 @@ public class ExchangeRatesServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        PrintWriter printWriter = response.getWriter();
-
         List<ExchangeRate> exchangeRates = exchangeRateService.getAllExchangeRates();
-        List<ExchangeRateDto> exchangeRateDtos = new ArrayList<>();
+        List<ExchangeRateResponseDto> exchangeRateResponseDtos = new ArrayList<>();
 
         for (ExchangeRate ex : exchangeRates) {
-            exchangeRateDtos.add(ExchangeRateDto.exchangeRateToDto(ex));
+            exchangeRateResponseDtos.add(ExchangeRateResponseDto.exchangeRateToDto(ex));
         }
 
         response.setStatus(HttpServletResponse.SC_OK);
-        objectMapper.writeValue(printWriter, exchangeRateDtos);
+        objectMapper.writeValue(getWriter(response), exchangeRateResponseDtos);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        String baseCurrencyCode = request.getParameter("baseCurrencyCode");
-        String targetCurrencyCode = request.getParameter("targetCurrencyCode");
-        String rate = request.getParameter("rate");
+        String baseCurrencyCode = extractNotNullParameter(request, "baseCurrencyCode");
+        String targetCurrencyCode = extractNotNullParameter(request, "targetCurrencyCode");
+        String rate = extractNotNullParameter(request, "rate");
         baseCurrencyCode = baseCurrencyCode.toUpperCase();
         targetCurrencyCode = targetCurrencyCode.toUpperCase();
 
-        PrintWriter printWriter = response.getWriter();
-
-        validateNotBlank(baseCurrencyCode, "Отсутствует поле baseCurrencyCode");
-        validateNotBlank(targetCurrencyCode, "Отсутствует поле targetCurrencyCode");
-        validateNotBlank(rate, "Отсутствует поле rate");
-        validateCodeLength(baseCurrencyCode, "Код валюты должен состоять из трех букв");
-        validateCodeLength(targetCurrencyCode, "Код валюты должен состоять из трех букв");
-        validateCodeValue(baseCurrencyCode, "Код валюты должен состоять только из латинских букв");
-        validateCodeValue(targetCurrencyCode, "Код валюты должен состоять только из латинских букв");
-        validateRateAndAmountValue(rate, "Значение rate должно состоять только из цифр");
+        ExchangeRatesRequestDto exchangeRatesRequest = new ExchangeRatesRequestDto();
+        exchangeRatesRequest.setBaseCurrency(baseCurrencyCode);
+        exchangeRatesRequest.setTargetCurrency(targetCurrencyCode);
+        exchangeRatesRequest.setRate(rate);
+        exchangeRatesRequest.validateExchangeRatesRequest();
 
         BigDecimal rateBD = new BigDecimal(rate);
         if (baseCurrencyCode.equals(targetCurrencyCode)) {
@@ -82,8 +69,8 @@ public class ExchangeRatesServlet extends HttpServlet {
             throw new NoSuchElementException("Обменный курс не найден");
         } else {
             ExchangeRate exchangeRate = optionalExchangeRate.get();
-            ExchangeRateDto exchangeRateDto = ExchangeRateDto.exchangeRateToDto(exchangeRate);
-            objectMapper.writeValue(printWriter, exchangeRateDto);
+            ExchangeRateResponseDto exchangeRateResponseDto = ExchangeRateResponseDto.exchangeRateToDto(exchangeRate);
+            objectMapper.writeValue(getWriter(response), exchangeRateResponseDto);
         }
     }
 

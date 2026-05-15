@@ -3,7 +3,6 @@ package org.example.currency_exchange.service;
 import lombok.AllArgsConstructor;
 import org.example.currency_exchange.dao.CurrencyDao;
 import org.example.currency_exchange.dao.ExchangeRateDao;
-import org.example.currency_exchange.exceptions.DataBaseException;
 import org.example.currency_exchange.models.Currency;
 import org.example.currency_exchange.models.ExchangeRate;
 
@@ -19,15 +18,15 @@ public class ExchangeRateService {
     private ExchangeRateDao exchangeRateDao;
     private CurrencyDao currencyDao;
 
-    public List<ExchangeRate> getAllExchangeRates() throws DataBaseException {
+    public List<ExchangeRate> getAllExchangeRates()  {
         return exchangeRateDao.getAllExchangeRates();
     }
 
-    public Optional<ExchangeRate> getExchangeRateByCodes(String base, String target) throws DataBaseException {
+    public Optional<ExchangeRate> getExchangeRateByCodes(String base, String target) {
         return exchangeRateDao.getExchangeRatesByCodes(base, target);
     }
 
-    public void putExchangeRateIntoDB(String base, String target, BigDecimal rate) throws DataBaseException {
+    public void putExchangeRateIntoDB(String base, String target, BigDecimal rate) {
 
         Currency baseCurrency = currencyDao.getCurrencyByCode(base)
                 .orElseThrow(() -> new NoSuchElementException("Валюта " + base + " не найдена"));
@@ -40,7 +39,7 @@ public class ExchangeRateService {
         exchangeRateDao.putExchangeRateIntoDB(baseId, targetId, rate);
     }
 
-    public void updateExchangeRate(String base, String target, BigDecimal rate) throws DataBaseException {
+    public void updateExchangeRate(String base, String target, BigDecimal rate) {
 
         Currency baseCurrency = currencyDao.getCurrencyByCode(base)
                 .orElseThrow(() -> new NoSuchElementException("Валюта " + base + " не найдена"));

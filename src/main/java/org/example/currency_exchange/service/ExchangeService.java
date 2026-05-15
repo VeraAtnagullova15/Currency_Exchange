@@ -2,7 +2,7 @@ package org.example.currency_exchange.service;
 
 import lombok.AllArgsConstructor;
 import org.example.currency_exchange.dao.ExchangeRateDao;
-import org.example.currency_exchange.dto.ExchangeResult;
+import org.example.currency_exchange.dto.ExchangeResultResponseDto;
 import org.example.currency_exchange.models.ExchangeRate;
 
 import java.math.BigDecimal;
@@ -16,7 +16,7 @@ public class ExchangeService {
     private ExchangeRateDao exchangeRateDao;
 
 
-    public ExchangeResult exchange(String from, String to, BigDecimal amount) {
+    public ExchangeResultResponseDto exchange(String from, String to, BigDecimal amount) {
 
         BigDecimal scaledAmount = amount.setScale(2, RoundingMode.HALF_UP);
 
@@ -26,7 +26,7 @@ public class ExchangeService {
                 .orElseThrow(() -> new NoSuchElementException("Обменный курс не найден"));
     }
 
-    private Optional<ExchangeResult> directExchange(String from, String to, BigDecimal amount) {
+    private Optional<ExchangeResultResponseDto> directExchange(String from, String to, BigDecimal amount) {
 
         Optional<ExchangeRate> directOptional = exchangeRateDao.getExchangeRatesByCodes(from, to);
 
@@ -34,14 +34,14 @@ public class ExchangeService {
             ExchangeRate directExchangeRate = directOptional.get();
             BigDecimal rate = directExchangeRate.getRate();
             BigDecimal convertedAmount = amount.multiply(rate).setScale(2, RoundingMode.HALF_UP);
-            ExchangeResult result = new ExchangeResult(directExchangeRate.getBaseCurrency(), directExchangeRate.getTargetCurrency(),
+            ExchangeResultResponseDto result = new ExchangeResultResponseDto(directExchangeRate.getBaseCurrency(), directExchangeRate.getTargetCurrency(),
                     rate, amount, convertedAmount);
             return Optional.of(result);
         }
         return Optional.empty();
     }
 
-    private Optional<ExchangeResult> reverseExchange(String from, String to, BigDecimal amount) {
+    private Optional<ExchangeResultResponseDto> reverseExchange(String from, String to, BigDecimal amount) {
 
         Optional<ExchangeRate> reverseOptional = exchangeRateDao.getExchangeRatesByCodes(to, from);
 
@@ -50,14 +50,14 @@ public class ExchangeService {
             BigDecimal rate = reverseExchangeRate.getRate();
             BigDecimal reverseRate = BigDecimal.ONE.divide(rate, 6, RoundingMode.HALF_UP);
             BigDecimal convertedAmount = amount.multiply(reverseRate).setScale(2, RoundingMode.HALF_UP);
-            ExchangeResult result = new ExchangeResult(reverseExchangeRate.getBaseCurrency(), reverseExchangeRate.getTargetCurrency(),
+            ExchangeResultResponseDto result = new ExchangeResultResponseDto(reverseExchangeRate.getBaseCurrency(), reverseExchangeRate.getTargetCurrency(),
                     reverseRate, amount, convertedAmount);
             return Optional.of(result);
         }
         return Optional.empty();
     }
 
-    private Optional<ExchangeResult> exchangeByUsd(String from, String to, BigDecimal amount) {
+    private Optional<ExchangeResultResponseDto> exchangeByUsd(String from, String to, BigDecimal amount) {
 
         String USD = "USD";
         Optional<ExchangeRate> USDfromOptional = exchangeRateDao.getExchangeRatesByCodes(USD, from);
@@ -68,7 +68,7 @@ public class ExchangeService {
             BigDecimal UsdToRate = USDtoOptional.get().getRate();
             BigDecimal rate = UsdToRate.divide(UsdFromRate, 6, RoundingMode.HALF_UP);
             BigDecimal convertedAmount = amount.multiply(rate).setScale(2, RoundingMode.HALF_UP);
-            ExchangeResult result = new ExchangeResult(USDfromOptional.get().getTargetCurrency(),
+            ExchangeResultResponseDto result = new ExchangeResultResponseDto(USDfromOptional.get().getTargetCurrency(),
                     USDtoOptional.get().getTargetCurrency(), rate, amount, convertedAmount);
             return Optional.of(result);
         }

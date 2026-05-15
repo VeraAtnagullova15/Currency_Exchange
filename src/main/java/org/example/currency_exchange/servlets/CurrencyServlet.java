@@ -3,25 +3,20 @@ package org.example.currency_exchange.servlets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.NoArgsConstructor;
-import org.example.currency_exchange.dao.CurrencyDao;
-import org.example.currency_exchange.dto.CurrencyDto;
+import org.example.currency_exchange.dto.CurrencyResponseDto;
 import org.example.currency_exchange.models.Currency;
 import org.example.currency_exchange.service.CurrencyService;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.example.currency_exchange.utils.ValidationUtils.*;
 
-@NoArgsConstructor
 @WebServlet("/currency/*")
-public class CurrencyServlet extends HttpServlet {
+public class CurrencyServlet extends BaseServlet {
 
     private ObjectMapper objectMapper;
     private CurrencyService currencyService;
@@ -35,12 +30,8 @@ public class CurrencyServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        PrintWriter printWriter = response.getWriter();
+        String code = extractNotNullPathInfo(request, "Код валюты отсутствует в адресе");
 
-        String pathInfo = request.getPathInfo();
-        String code = pathInfo.substring(1).toUpperCase();
-
-        validateNotBlank(code, "Код валюты отсутствует в адресе");
         validateCodeLength(code, "Поле code должно состоять из трех букв");
         validateCodeValue(code, "Поле code должно состоять только из латинских букв");
 
@@ -51,9 +42,9 @@ public class CurrencyServlet extends HttpServlet {
             throw new NoSuchElementException("Валюта не найдена");
         } else {
             Currency currency = optional.get();
-            CurrencyDto currencyDto = CurrencyDto.currencyToDto(currency);
+            CurrencyResponseDto currencyResponseDto = CurrencyResponseDto.currencyToDto(currency);
             response.setStatus(HttpServletResponse.SC_OK);
-            objectMapper.writeValue(printWriter, currencyDto);
+            objectMapper.writeValue(getWriter(response), currencyResponseDto);
 
         }
     }

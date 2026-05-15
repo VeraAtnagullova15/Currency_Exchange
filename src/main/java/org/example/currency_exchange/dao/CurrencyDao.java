@@ -58,6 +58,7 @@ public class CurrencyDao {
             try (ResultSet resultSet = preparedStatement.executeQuery();) {
 
                 if (resultSet.next()) {
+
                     Currency currency = new Currency();
                     currency.setId(resultSet.getInt("ID"));
                     currency.setCode(resultSet.getString("Code"));
@@ -85,6 +86,7 @@ public class CurrencyDao {
             preparedStatement.setString(3, sign);
 
             preparedStatement.executeUpdate();
+
         } catch (SQLException sqlException) {
             if (sqlException instanceof SQLiteException sqLiteException) {
                 if (sqLiteException.getResultCode() == SQLiteErrorCode.SQLITE_CONSTRAINT_UNIQUE) {

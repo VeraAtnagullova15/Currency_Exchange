@@ -3,30 +3,23 @@ package org.example.currency_exchange.servlets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.NoArgsConstructor;
-import org.example.currency_exchange.dao.CurrencyDao;
-import org.example.currency_exchange.dao.ExchangeRateDao;
-import org.example.currency_exchange.dto.ExchangeRateDto;
+import org.example.currency_exchange.dto.ExchangeRatesRequestDto;
+import org.example.currency_exchange.dto.ExchangeRateRequestDto;
+import org.example.currency_exchange.dto.ExchangeRateResponseDto;
 import org.example.currency_exchange.models.ExchangeRate;
-import org.example.currency_exchange.service.CurrencyService;
 import org.example.currency_exchange.service.ExchangeRateService;
-import org.example.currency_exchange.service.ExchangeService;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.example.currency_exchange.utils.ValidationUtils.*;
 
-
-@NoArgsConstructor
 @WebServlet("/exchangeRate/*")
-public class ExchangeRateServlet extends HttpServlet {
+public class ExchangeRateServlet extends BaseServlet {
 
     private ObjectMapper objectMapper;
     private ExchangeRateService exchangeRateService;
@@ -39,23 +32,18 @@ public class ExchangeRateServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        String pathInfo = request.getPathInfo().substring(1);
-        validateNotBlank(pathInfo, "Код валюты отсутствует в адресе");
 
-        String pairCurrencies = pathInfo.toUpperCase();
+        String pairCurrencies = extractNotNullPathInfo(request, "Коды валют отсутствуют в запросе");
         validateCurrencyPairLength(pairCurrencies, "Валютная пара должна состоять из 6 символов");
 
         String baseCurrency = pairCurrencies.substring(0, 3);
         String targetCurrency = pairCurrencies.substring(3);
 
-        PrintWriter printWriter = response.getWriter();
+        ExchangeRateRequestDto exchangeRateRequest = new ExchangeRateRequestDto();
+        exchangeRateRequest.setBaseCurrency(baseCurrency);
+        exchangeRateRequest.setTargetCurrency(targetCurrency);
 
-        validateNotBlank(baseCurrency, "Код валюты отсутствует в адресе");
-        validateNotBlank(targetCurrency, "Код валюты отсутствует в адресе");
-        validateCodeLength(baseCurrency, "Код валюты должен состоять из трех букв");
-        validateCodeLength(targetCurrency, "Код валюты должен состоять из трех букв");
-        validateCodeValue(baseCurrency, "Код валюты должен состоять только из латинских букв");
-        validateCodeValue(targetCurrency, "Код валюты должен состоять только из латинских букв");
+        exchangeRateRequest.validateExchangeRateRequest();
 
         Optional<ExchangeRate> optional = exchangeRateService.getExchangeRateByCodes(baseCurrency, targetCurrency);
 
@@ -63,9 +51,9 @@ public class ExchangeRateServlet extends HttpServlet {
             throw new NoSuchElementException("Обменный курс не найден");
         } else {
             ExchangeRate exchangeRate = optional.get();
-            ExchangeRateDto exchangeRateDto = ExchangeRateDto.exchangeRateToDto(exchangeRate);
+            ExchangeRateResponseDto exchangeRateResponseDto = ExchangeRateResponseDto.exchangeRateToDto(exchangeRate);
             response.setStatus(HttpServletResponse.SC_OK);
-            objectMapper.writeValue(printWriter, exchangeRateDto);
+            objectMapper.writeValue(getWriter(response), exchangeRateResponseDto);
         }
     }
 
@@ -75,10 +63,7 @@ public class ExchangeRateServlet extends HttpServlet {
 
         if ("PATCH".equalsIgnoreCase(request.getMethod())) {
 
-            String pathInfo = request.getPathInfo().substring(1);
-            validateNotBlank(pathInfo, "Код валюты отсутствует в адресе");
-
-            String pairCurrencies = pathInfo.toUpperCase();
+            String pairCurrencies = extractNotNullPathInfo(request, "Коды валют отсутствуют в запросе");
             validateCurrencyPairLength(pairCurrencies, "Валютная пара должна состоять из 6 символов");
 
             String baseCurrency = pairCurrencies.substring(0, 3);
@@ -87,16 +72,11 @@ public class ExchangeRateServlet extends HttpServlet {
             validatePatchBodyRequest(body, "Отсутствует поле rate");
             String rate = body.split("=")[1];
 
-            PrintWriter printWriter = response.getWriter();
-
-            validateNotBlank(baseCurrency, "Код валюты отсутствует в адресе");
-            validateNotBlank(targetCurrency, "Код валюты отсутствует в адресе");
-            validateNotBlank(rate, "rate не указан");
-            validateCodeLength(baseCurrency, "Код валюты должен состоять из трех букв");
-            validateCodeLength(targetCurrency, "Код валюты должен состоять из трех букв");
-            validateCodeValue(baseCurrency, "Код валюты должен состоять только из латинских букв");
-            validateCodeValue(targetCurrency, "Код валюты должен состоять только из латинских букв");
-            validateRateAndAmountValue(rate, "Значение rate должно состоять из цифр");
+            ExchangeRatesRequestDto patchRequestDto = new ExchangeRatesRequestDto();
+            patchRequestDto.setBaseCurrency(baseCurrency);
+            patchRequestDto.setTargetCurrency(targetCurrency);
+            patchRequestDto.setRate(rate);
+            patchRequestDto.validateExchangeRatesRequest();
 
             BigDecimal rateBD = new BigDecimal(rate);
 
@@ -108,8 +88,8 @@ public class ExchangeRateServlet extends HttpServlet {
                 Optional<ExchangeRate> updated = exchangeRateService.getExchangeRateByCodes(baseCurrency,targetCurrency);
                 ExchangeRate exchangeRate = updated.get();
                 response.setStatus(HttpServletResponse.SC_OK);
-                ExchangeRateDto exchangeRateDto = ExchangeRateDto.exchangeRateToDto(exchangeRate);
-                objectMapper.writeValue(printWriter, exchangeRateDto);
+                ExchangeRateResponseDto exchangeRateResponseDto = ExchangeRateResponseDto.exchangeRateToDto(exchangeRate);
+                objectMapper.writeValue(getWriter(response), exchangeRateResponseDto);
             }
 
         } else {
