@@ -9,6 +9,7 @@ import org.example.currency_exchange.dto.ExchangeRateResponseDto;
 import org.example.currency_exchange.dto.ExchangeRatesRequestDto;
 import org.example.currency_exchange.models.ExchangeRate;
 import org.example.currency_exchange.service.ExchangeRateService;
+import org.example.currency_exchange.utils.ValidationRequestDto;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -44,17 +45,16 @@ public class ExchangeRatesServlet extends BaseServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        String baseCurrencyCode = extractNotNullParameter(request, "baseCurrencyCode");
-        String targetCurrencyCode = extractNotNullParameter(request, "targetCurrencyCode");
+        String baseCurrencyCode = extractNotNullCode(request, "baseCurrencyCode");
+        String targetCurrencyCode = extractNotNullCode(request, "targetCurrencyCode");
         String rate = extractNotNullParameter(request, "rate");
-        baseCurrencyCode = baseCurrencyCode.toUpperCase();
-        targetCurrencyCode = targetCurrencyCode.toUpperCase();
 
         ExchangeRatesRequestDto exchangeRatesRequest = new ExchangeRatesRequestDto();
         exchangeRatesRequest.setBaseCurrency(baseCurrencyCode);
         exchangeRatesRequest.setTargetCurrency(targetCurrencyCode);
         exchangeRatesRequest.setRate(rate);
-        exchangeRatesRequest.validateExchangeRatesRequest();
+
+        ValidationRequestDto.validateExchangeRatesRequest(exchangeRatesRequest);
 
         BigDecimal rateBD = new BigDecimal(rate);
         if (baseCurrencyCode.equals(targetCurrencyCode)) {

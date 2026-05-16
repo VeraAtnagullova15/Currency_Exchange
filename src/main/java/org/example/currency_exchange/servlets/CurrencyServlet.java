@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.example.currency_exchange.dto.CurrencyResponseDto;
 import org.example.currency_exchange.models.Currency;
 import org.example.currency_exchange.service.CurrencyService;
@@ -15,6 +16,8 @@ import java.util.Optional;
 
 import static org.example.currency_exchange.utils.ValidationUtils.*;
 
+
+@Slf4j
 @WebServlet("/currency/*")
 public class CurrencyServlet extends BaseServlet {
 
@@ -30,10 +33,9 @@ public class CurrencyServlet extends BaseServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        String code = extractNotNullPathInfo(request, "Код валюты отсутствует в адресе");
+        String code = extractValidPathInfoCode(request);
+        log.info(code);
 
-        validateCodeLength(code, "Поле code должно состоять из трех букв");
-        validateCodeValue(code, "Поле code должно состоять только из латинских букв");
 
         Optional<Currency> optional = currencyService.getCurrencyByCode(code);
 

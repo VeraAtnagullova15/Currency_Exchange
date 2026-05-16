@@ -15,12 +15,4 @@ public class ExchangeRequestDto {
     private String to;
     private String amount;
 
-    public void validateExchangeRequest() {
-        validateNotBlank(from, "Отсутствует поле from");
-        validateNotBlank(to, "Отсутствует поле to");
-        validateNotBlank(amount, "Отсутствует поле amount");
-        validateCodeLength(from, "Код валюты from должен состоять из трех букв");
-        validateCodeLength(to, "Код валюты to должен состоять из трех букв");
-        validateRateAndAmountValue(amount, "Значение amount должно состоять из цифр");
-    }
 }

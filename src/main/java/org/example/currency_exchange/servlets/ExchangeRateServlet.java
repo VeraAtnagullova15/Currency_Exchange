@@ -10,6 +10,7 @@ import org.example.currency_exchange.dto.ExchangeRateRequestDto;
 import org.example.currency_exchange.dto.ExchangeRateResponseDto;
 import org.example.currency_exchange.models.ExchangeRate;
 import org.example.currency_exchange.service.ExchangeRateService;
+import org.example.currency_exchange.utils.ValidationRequestDto;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -33,8 +34,7 @@ public class ExchangeRateServlet extends BaseServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
 
-        String pairCurrencies = extractNotNullPathInfo(request, "Коды валют отсутствуют в запросе");
-        validateCurrencyPairLength(pairCurrencies, "Валютная пара должна состоять из 6 символов");
+        String pairCurrencies = extractValidPathInfoPairCurrencies(request);
 
         String baseCurrency = pairCurrencies.substring(0, 3);
         String targetCurrency = pairCurrencies.substring(3);
@@ -43,7 +43,7 @@ public class ExchangeRateServlet extends BaseServlet {
         exchangeRateRequest.setBaseCurrency(baseCurrency);
         exchangeRateRequest.setTargetCurrency(targetCurrency);
 
-        exchangeRateRequest.validateExchangeRateRequest();
+        ValidationRequestDto.validateExchangeRateRequest(exchangeRateRequest);
 
         Optional<ExchangeRate> optional = exchangeRateService.getExchangeRateByCodes(baseCurrency, targetCurrency);
 
@@ -63,20 +63,19 @@ public class ExchangeRateServlet extends BaseServlet {
 
         if ("PATCH".equalsIgnoreCase(request.getMethod())) {
 
-            String pairCurrencies = extractNotNullPathInfo(request, "Коды валют отсутствуют в запросе");
-            validateCurrencyPairLength(pairCurrencies, "Валютная пара должна состоять из 6 символов");
+            String pairCurrencies = extractValidPathInfoPairCurrencies(request);
 
             String baseCurrency = pairCurrencies.substring(0, 3);
             String targetCurrency = pairCurrencies.substring(3);
-            String body = request.getReader().readLine();
-            validatePatchBodyRequest(body, "Отсутствует поле rate");
-            String rate = body.split("=")[1];
+
+            String rate = extractValidParameterFromBodyRequest(request);
 
             ExchangeRatesRequestDto patchRequestDto = new ExchangeRatesRequestDto();
             patchRequestDto.setBaseCurrency(baseCurrency);
             patchRequestDto.setTargetCurrency(targetCurrency);
             patchRequestDto.setRate(rate);
-            patchRequestDto.validateExchangeRatesRequest();
+
+            ValidationRequestDto.validateExchangeRatesRequest(patchRequestDto);
 
             BigDecimal rateBD = new BigDecimal(rate);
 

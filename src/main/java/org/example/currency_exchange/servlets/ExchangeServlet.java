@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.example.currency_exchange.dto.ExchangeRequestDto;
 import org.example.currency_exchange.dto.ExchangeResultResponseDto;
 import org.example.currency_exchange.service.ExchangeService;
+import org.example.currency_exchange.utils.ValidationRequestDto;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -26,17 +27,16 @@ public class ExchangeServlet extends BaseServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        String from = extractNotNullParameter(request, "from");
-        String to = extractNotNullParameter(request, "to");
+        String from = extractNotNullCode(request, "from");
+        String to = extractNotNullCode(request, "to");
         String amount = extractNotNullParameter(request, "amount");
-        from = from.toUpperCase();
-        to = to.toUpperCase();
 
         ExchangeRequestDto exchangeRequest = new ExchangeRequestDto();
         exchangeRequest.setFrom(from);
         exchangeRequest.setTo(to);
         exchangeRequest.setAmount(amount);
-        exchangeRequest.validateExchangeRequest();
+
+        ValidationRequestDto.validateExchangeRequest(exchangeRequest);
 
         BigDecimal amountBD = new BigDecimal(amount);
 

@@ -7,6 +7,7 @@ import org.example.currency_exchange.dto.CurrencyRequestDto;
 import org.example.currency_exchange.dto.CurrencyResponseDto;
 import org.example.currency_exchange.models.Currency;
 import org.example.currency_exchange.service.CurrencyService;
+import org.example.currency_exchange.utils.ValidationRequestDto;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,16 +43,15 @@ public class CurrenciesServlet extends BaseServlet {
             throws IOException, ServletException {
 
         String name = extractNotNullParameter(request, "name");
-        String code = extractNotNullParameter(request, "code");
+        String code = extractNotNullCode(request, "code");
         String sign = extractNotNullParameter(request, "sign");
-        code = code.toUpperCase();
 
         CurrencyRequestDto currencyRequest = new CurrencyRequestDto();
         currencyRequest.setName(name);
         currencyRequest.setCode(code);
         currencyRequest.setSign(sign);
 
-        currencyRequest.validateCurrencyRequest();
+        ValidationRequestDto.validateCurrencyRequest(currencyRequest);
 
         response.setStatus(HttpServletResponse.SC_CREATED);
 

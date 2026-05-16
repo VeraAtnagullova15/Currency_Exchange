@@ -15,14 +15,4 @@ public class ExchangeRatesRequestDto {
     private String targetCurrency;
     private String rate;
 
-    public void validateExchangeRatesRequest() {
-        validateNotBlank(baseCurrency, "Код валюты отсутствует в адресе");
-        validateNotBlank(targetCurrency, "Код валюты отсутствует в адресе");
-        validateNotBlank(rate, "rate не указан");
-        validateCodeLength(baseCurrency, "Код валюты должен состоять из трех букв");
-        validateCodeLength(targetCurrency, "Код валюты должен состоять из трех букв");
-        validateCodeValue(baseCurrency, "Код валюты должен состоять только из латинских букв");
-        validateCodeValue(targetCurrency, "Код валюты должен состоять только из латинских букв");
-        validateRateAndAmountValue(rate, "Значение rate должно состоять из цифр");
-    }
 }
